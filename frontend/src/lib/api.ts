@@ -3,6 +3,8 @@
 import type { ClaudeModel, ProviderChoice, ProvidersResponse } from "../types/ai";
 import type {
   AppInfo,
+  CellEdit,
+  CellsResult,
   Column,
   ConversionSummary,
   ConversionView,
@@ -102,6 +104,8 @@ export const api = {
     /** Relit le fichier d'origine avec ces options. */
     reparse: (id: string, options: ParseOptions) => request<ConversionView>(`/conversions/${id}/options`, { method: "PUT", body: JSON.stringify(options) }),
     setColumns: (id: string, columns: Column[]) => request<ConversionView>(`/conversions/${id}/columns`, { method: "PUT", body: JSON.stringify({ columns }) }),
+    /** Corrige des cellules ; dans un relevé, Montant suit Débit / Crédit (et inversement). */
+    editCells: (id: string, edits: CellEdit[]) => request<CellsResult>(`/conversions/${id}/cells`, { method: "PATCH", body: JSON.stringify({ edits }) }),
     rename: (id: string, name: string) => request<ConversionView>(`/conversions/${id}/name`, { method: "PUT", body: JSON.stringify({ name }) }),
     remove: (id: string) => request<{ deleted: boolean }>(`/conversions/${id}`, { method: "DELETE" }),
     /** Fichier exporté (colonnes incluses), avec son nom. */

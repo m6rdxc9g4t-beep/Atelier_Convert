@@ -60,8 +60,12 @@ CSV Windows-1252 avec préambule, un fichier OFX, et le même relevé scanné po
 Dans tous les cas : types déduits (date, montant, nombre, oui / non, texte), nombres au format français ou anglais,
 et, quand les colonnes ressemblent à un relevé, **mise en forme normalisée** (quelle que soit la banque) — à
 désactiver par « Telle quelle ». Dans l'aperçu : renommer, écarter, retyper, réordonner les colonnes ; une valeur qui
-ne se convertit pas est surlignée et gardée telle quelle. Tout reste modifiable : « Relire le fichier » avec d'autres
-options (pages, année, séparateur, encodage, en-tête, lignes à ignorer, virgule décimale, ordre des dates).
+ne se convertit pas est surlignée et gardée telle quelle. **Corriger une cellule** (libellé, date, montant…) :
+double-clic, Entrée ou simplement taper, puis Entrée (ligne suivante), Tab (cellule suivante) ou Échap ; la cellule
+corrigée porte un coin doré et rappelle la valeur lue dans le fichier. Dans un relevé, Montant suit Débit / Crédit, et
+**⇄** (au survol du numéro de ligne) passe une opération de débit en crédit ou l'inverse ; totaux et contrôle des soldes
+sont recalculés. Tout reste modifiable : « Relire le fichier » avec d'autres options (pages, année, séparateur, encodage,
+en-tête, lignes à ignorer, virgule décimale, ordre des dates) — la relecture repart du fichier et efface les corrections.
 
 ## OCR (relevés scannés et photos)
 

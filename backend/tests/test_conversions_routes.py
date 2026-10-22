@@ -110,6 +110,74 @@ def test_update_columns(client: TestClient) -> None:
     assert client.put(f"/api/conversions/{conv['id']}/columns", json={"columns": dup}).status_code == 422
 
 
+def test_edit_cells(client: TestClient) -> None:
+    """Libellé corrigé, valeur lue gardée ; retour à la valeur lue = plus de marque."""
+    conv = upload(client)
+    first = conv["preview"][0]
+    url = f"/api/conversions/{conv['id']}/cells"
+    r = client.patch(url, json={"edits": [{"row": 0, "key": "libelle", "value": "  Électricité   EDF "}]})
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["rows"] == [{"index": 0, "values": {**first, "libelle": "Électricité EDF"}}]
+    assert body["conversion"]["edited"] == {"0:libelle": first["libelle"]}
+    assert body["conversion"]["preview"][0]["libelle"] == "Électricité EDF"
+    # Gardé sur le disque, exporté tel quel.
+    assert client.get(f"/api/conversions/{conv['id']}").json()["preview"][0]["libelle"] == "Électricité EDF"
+    text = client.get(f"/api/conversions/{conv['id']}/export?format=csv-fr").content.decode("utf-8-sig")
+    assert "Électricité EDF" in text.splitlines()[1]
+    # Retour à la valeur lue.
+    back = client.patch(url, json={"edits": [{"row": 0, "key": "libelle", "value": first["libelle"]}]}).json()
+    assert back["conversion"]["edited"] == {}
+
+
+def test_edit_cells_statement_amounts_follow(client: TestClient) -> None:
+    """Relevé : débit ↔ crédit inversés, Montant suit ; Montant saisi, Débit / Crédit suivent ; synthèse recalculée."""
+    conv = upload(client)
+    url = f"/api/conversions/{conv['id']}/cells"
+    first = conv["preview"][0]
+    assert first["debit"] == 84.2 and first["montant"] == -84.2
+    before = conv["statement"]
+    swap = [{"row": 0, "key": "debit", "value": None}, {"row": 0, "key": "credit", "value": 84.2}]
+    body = client.patch(url, json={"edits": swap}).json()
+    row = body["rows"][0]["values"]
+    assert (row["debit"], row["credit"], row["montant"]) == (None, 84.2, 84.2)
+    assert set(body["conversion"]["edited"]) == {"0:debit", "0:credit", "0:montant"}
+    after = body["conversion"]["statement"]
+    assert after["total_debit"] == round(before["total_debit"] - 84.2, 2)
+    assert after["total_credit"] == round(before["total_credit"] + 84.2, 2)
+    # Montant saisi à la française : Débit / Crédit déduits ; débit négatif saisi = positif.
+    row = client.patch(url, json={"edits": [{"row": 0, "key": "montant", "value": "-1 234,50"}]}).json()["rows"][0]
+    assert (row["values"]["debit"], row["values"]["credit"], row["values"]["montant"]) == (1234.5, None, -1234.5)
+    row = client.patch(url, json={"edits": [{"row": 0, "key": "debit", "value": "-12,5"}]}).json()["rows"][0]
+    assert (row["values"]["debit"], row["values"]["montant"]) == (12.5, -12.5)
+    # Date saisie JJ/MM/AAAA.
+    row = client.patch(url, json={"edits": [{"row": 0, "key": "date", "value": "03/02/2026"}]}).json()["rows"][0]
+    assert row["values"]["date"] == "2026-02-03"
+
+
+def test_edit_cells_refused(client: TestClient) -> None:
+    conv = upload(client)
+    url = f"/api/conversions/{conv['id']}/cells"
+    r = client.patch(url, json={"edits": [{"row": 0, "key": "montant", "value": "douze"}]})
+    assert r.status_code == 422 and "n'est pas un montant" in r.json()["detail"]
+    r = client.patch(url, json={"edits": [{"row": 0, "key": "date", "value": "bientôt"}]})
+    assert r.status_code == 422 and "une date" in r.json()["detail"]
+    assert client.patch(url, json={"edits": [{"row": 9999, "key": "libelle", "value": "x"}]}).status_code == 409
+    assert client.patch(url, json={"edits": [{"row": 0, "key": "inconnue", "value": "x"}]}).status_code == 409
+    assert client.patch(url, json={"edits": []}).status_code == 422
+    missing = client.patch("/api/conversions/000000000000/cells", json={"edits": [{"row": 0, "key": "a"}]})
+    assert missing.status_code == 404
+    # Rien n'a changé.
+    assert client.get(f"/api/conversions/{conv['id']}").json()["edited"] == {}
+
+
+def test_reparse_drops_cell_edits(client: TestClient) -> None:
+    conv = upload(client)
+    client.patch(f"/api/conversions/{conv['id']}/cells", json={"edits": [{"row": 0, "key": "libelle", "value": "X"}]})
+    body = client.put(f"/api/conversions/{conv['id']}/options", json={**conv["options"], "profile": "auto"}).json()
+    assert body["edited"] == {} and body["preview"][0]["libelle"] == conv["preview"][0]["libelle"]
+
+
 def test_rename_and_delete(client: TestClient, settings: Settings) -> None:
     conv = upload(client)
     assert (

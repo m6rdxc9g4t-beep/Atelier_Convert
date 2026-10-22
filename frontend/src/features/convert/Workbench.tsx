@@ -5,7 +5,7 @@ import { toast } from "../../components/Toaster";
 import { api } from "../../lib/api";
 import { KIND_LABELS, formatSize } from "../../lib/format";
 import { conversionPath, navigate } from "../../lib/router";
-import type { AppInfo, CellValue, Column, ConversionView, ParseOptions } from "../../types/convert";
+import type { AppInfo, CellEdit, CellValue, Column, ConversionView, ParseOptions } from "../../types/convert";
 import { AiPanel } from "./AiPanel";
 import { ACCEPT } from "./Dropzone";
 import { ExportPanel } from "./ExportPanel";
@@ -52,6 +52,24 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
     if (!conv) return;
     setConv({ ...conv, table_columns: columns }); // affichage immédiat, puis valeur confirmée par le serveur
     void act(() => api.conversions.setColumns(conv.id, columns)).then(() => undefined);
+  };
+
+  /** Corrections de cellules : la conversion (synthèse, marques) et les lignes déjà chargées sont mises à jour. */
+  const editCells = async (edits: CellEdit[]): Promise<boolean> => {
+    if (!conv) return false;
+    try {
+      const result = await api.conversions.editCells(conv.id, edits);
+      setConv(result.conversion);
+      setRows((current) => {
+        const next = [...current];
+        for (const { index, values } of result.rows) if (index < next.length) next[index] = values;
+        return next;
+      });
+      return true;
+    } catch (e) {
+      toast(e instanceof Error ? e.message : String(e), "error");
+      return false;
+    }
   };
 
   const reparse = (options: ParseOptions) => {
@@ -175,7 +193,9 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
             rows={rows}
             total={conv.rows}
             busy={busy}
+            edited={conv.edited}
             onColumns={saveColumns}
+            onCells={editCells}
             onMore={rows.length < conv.rows ? () => void more() : null}
           />
         </div>

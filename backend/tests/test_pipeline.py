@@ -114,6 +114,25 @@ def test_december_operations_in_january_statement_take_previous_year() -> None:
     assert [r["date"] for r in table.rows] == ["2025-12-30", "2026-01-03"]
 
 
+def test_unsigned_amount_received_is_credit() -> None:
+    """Montants sans signe : « reçu » n'importe où dans le libellé = crédit ; « émis », un paiement = débit."""
+    words = [
+        Word("Date", 40, 60, 100), Word("Libellé", 100, 130, 100), Word("Montant", 400, 440, 100),
+        Word("11/08/2026", 40, 90, 120), Word("Paiement", 100, 140, 120), Word("reçu", 142, 160, 120),
+        Word("de", 162, 170, 120), Word("Sumeria", 172, 200, 120), Word("0,61", 420, 440, 120),
+        Word("18/08/2026", 40, 90, 135), Word("Virement", 100, 140, 135), Word("interne", 142, 170, 135),
+        Word("reçu", 172, 190, 135), Word("21,73", 415, 440, 135),
+        Word("23/08/2026", 40, 90, 150), Word("Virement", 100, 140, 150), Word("SEPA", 142, 160, 150),
+        Word("émis", 162, 180, 150), Word("15,00", 415, 440, 150),
+        Word("24/08/2026", 40, 90, 165), Word("Paiement", 100, 140, 165), Word("carte", 142, 160, 165),
+        Word("CINEMA", 162, 190, 165), Word("33,20", 415, 440, 165),
+    ]  # fmt: skip
+    table = extract_statement(group_lines(words), "", ParseOptions())
+    assert table is not None
+    assert [r["credit"] for r in table.rows] == [0.61, 21.73, None, None]
+    assert [r["montant"] for r in table.rows] == [0.61, 21.73, -15.0, -33.2]
+
+
 def test_merge_numbers_rejoins_thousands() -> None:
     merged = merge_numbers([Word("1", 400, 405, 10), Word("234,56", 408, 430, 10), Word("€", 432, 438, 10)])
     assert [w.text for w in merged] == ["1 234,56"]

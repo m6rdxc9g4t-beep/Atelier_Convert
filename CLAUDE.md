@@ -47,6 +47,11 @@ Tab. Même architecture et même design qu'Atelier Viz (FastAPI + React), dont i
   `src/storage/format.ts` de Tab), jamais `atelier.json` ni une table existante ; écriture atomique (fichier caché `.…tmp`,
   ignoré par la surveillance de Tab). Toute évolution du format de Tab se reporte ici avec un test
   (`test_send_to_tab_validates_with_tab_schema`).
+- `service.edit_cells` (`PATCH /api/conversions/{id}/cells`) : corrections de cellules converties dans le type de la
+  colonne (saisie incompatible → 422, jamais gardée en texte) ; Débit / Crédit positifs, Montant les suit (et inversement,
+  par les rôles) ; valeur lue gardée dans `Conversion.edited` (« ligne:clé »), vidé par une relecture ou l'IA ; synthèse
+  recalculée ; événement `updated` (`reason: "cells"`). Front : `PreviewTable` (cellules en tabindex itinérant, `swapEdits`).
+- Sens d'un montant sans signe : `looks_like_credit` (`CREDIT_HINTS` + « reçu » où qu'il soit dans le libellé).
 - `ai_structure.py` : prompt système = consignes seulement ; le texte du document voyage dans la conversation dans
   `<donnees>…</donnees>` (docs/SUITE.md §5.3–5.4) ; borné par `AI_MAX_LINES` / `AI_MAX_CHARS`.
 

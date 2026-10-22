@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import { fileNameFrom } from "./api";
-import { formatCell, formatDate, formatSize, unconverted } from "./format";
+import { editText, formatCell, formatDate, formatSize, unconverted } from "./format";
 import { parseRoute } from "./router";
 
 describe("mise en forme française", () => {
+  it("texte proposé pour corriger une cellule", () => {
+    expect(editText(-1234.5, "currency")).toBe("-1234,5");
+    expect(editText("2026-08-18", "date")).toBe("18/08/2026");
+    expect(editText(true, "boolean")).toBe("Oui");
+    expect(editText(null, "text")).toBe("");
+    expect(editText("Virement reçu", "text")).toBe("Virement reçu");
+  });
+
   it("montants, dates, booléens, tailles", () => {
     expect(formatCell(-84.2, "currency").replace(/\s/g, " ")).toBe("-84,20 €");
     expect(formatCell(1234.5, "number").replace(/\s/g, " ")).toBe("1 234,5");

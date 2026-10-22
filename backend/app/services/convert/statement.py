@@ -172,6 +172,15 @@ CREDIT_HINTS = (
     "vir recu", "vir sepa recu", "virement recu", "virement de", "vir inst recu", "remise", "versement", "rembourst",
     "remboursement", "avoir", "salaire", "interets", "depot", "prime", "allocation", "caf ", "cpam", "retour",
 )  # fmt: skip
+# « Virement interne reçu », « Paiement reçu de… », « Virement SEPA reçu de… » : « reçu » seul suffit.
+RECEIVED = re.compile(r"\brecue?s?\b")
+
+
+def looks_like_credit(label: str) -> bool:
+    """Vrai si le libellé d'une opération sans signe ressemble à une entrée d'argent."""
+    low = " " + norm(label) + " "
+    return any(h in low for h in CREDIT_HINTS) or bool(RECEIVED.search(low))
+
 
 BANKS = (
     "Crédit Agricole", "BNP Paribas", "Société Générale", "LCL", "Crédit Mutuel", "CIC", "La Banque Postale",
@@ -476,8 +485,7 @@ def _assign_amounts(txns: list[Txn], anchors: list[Anchor] | None) -> set[str]:
             elif _has_sign(t):
                 t.credit = t.amount
             else:
-                low = " " + norm(t.label) + " "
-                if any(h in low for h in CREDIT_HINTS):
+                if looks_like_credit(t.label):
                     t.credit = t.amount
                 else:
                     t.debit = t.amount

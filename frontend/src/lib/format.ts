@@ -25,6 +25,15 @@ export function formatCell(value: CellValue, type: ColumnType): string {
   return value;
 }
 
+/** Texte proposé pour corriger une cellule : « 1234,5 », « 15/03/2026 », « Oui » — sans symbole ni espace de milliers. */
+export function editText(value: CellValue, type: ColumnType): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "boolean") return value ? "Oui" : "Non";
+  if (typeof value === "number") return String(value).replace(".", ",");
+  if (type === "date") return formatDate(value);
+  return value;
+}
+
 /** Vrai si une valeur de colonne typée n'a pas pu être convertie (gardée en texte). */
 export function unconverted(value: CellValue, type: ColumnType): boolean {
   if (value === null || value === undefined) return false;

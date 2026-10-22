@@ -5,9 +5,9 @@ Une conversion = un fichier source (PDF, CSV, TXT, XLSX, OFX, QIF, JSON) + des o
 ou que l'on envoie dans Atelier Tab.
 """
 
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, StringConstraints, field_validator
 
 ColumnType = Literal["text", "number", "currency", "date", "boolean"]
 """Type d'une colonne : texte, nombre, montant (devise), date (AAAA-MM-JJ), case à cocher."""
@@ -109,6 +109,12 @@ class TabSend(BaseModel):
     rows: int
 
 
+EDITED_DOC = (
+    "Cellules corrigées à la main : « ligne:clé » → valeur lue dans le fichier. "
+    "Vidé quand le fichier est relu (options) ou restructuré par l'IA."
+)
+
+
 class ConversionSummary(BaseModel):
     """Entrée de l'historique."""
 
@@ -132,6 +138,7 @@ class Conversion(ConversionSummary):
     table_columns: list[Column]
     table_rows: list[dict[str, CellValue]]
     raw_text: str | None = Field(default=None, description="Texte extrait (PDF / TXT), pour « Structurer avec l'IA ».")
+    edited: dict[str, CellValue] = Field(default_factory=dict, description=EDITED_DOC)
 
 
 class ConversionView(ConversionSummary):
@@ -143,12 +150,39 @@ class ConversionView(ConversionSummary):
     preview: list[dict[str, CellValue]]
     preview_truncated: bool
     has_text: bool = Field(description="Un texte extrait est disponible pour « Structurer avec l'IA ».")
+    edited: dict[str, CellValue] = Field(default_factory=dict, description=EDITED_DOC)
 
 
 class ColumnsUpdate(BaseModel):
     """Libellés, types, ordre et inclusion des colonnes (même ensemble de clés, ordre libre)."""
 
     columns: list[Column] = Field(min_length=1, max_length=500)
+
+
+class CellEdit(BaseModel):
+    """Correction d'une cellule. `value` est convertie dans le type de la colonne (« 21,73 », « 18/08/2026 »)."""
+
+    row: int = Field(ge=0, description="Numéro de ligne (0 = première).")
+    key: str = Field(min_length=1, max_length=200, description="Clé de la colonne.")
+    value: Annotated[str, StringConstraints(max_length=5000)] | float | int | bool | None = None
+
+
+class CellsUpdate(BaseModel):
+    """Corrections de cellules, dans l'ordre. Dans un relevé, Montant suit Débit / Crédit (et inversement)."""
+
+    edits: list[CellEdit] = Field(min_length=1, max_length=1000)
+
+
+class EditedRow(BaseModel):
+    index: int
+    values: dict[str, CellValue]
+
+
+class CellsResult(BaseModel):
+    """Conversion mise à jour et lignes modifiées (valeurs complètes, pour l'aperçu déjà chargé)."""
+
+    conversion: ConversionView
+    rows: list[EditedRow]
 
 
 class RenameRequest(BaseModel):

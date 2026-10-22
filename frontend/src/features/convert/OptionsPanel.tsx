@@ -29,6 +29,7 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
   const kind = conversion.source.kind;
   const set = (patch: Partial<ParseOptions>) => setOpts((o) => ({ ...o, ...patch }));
   const dirty = JSON.stringify(opts) !== JSON.stringify(conversion.options);
+  const edits = Object.keys(conversion.edited).length;
   const isText = kind === "csv" || kind === "txt";
   const isSheet = kind === "xlsx" || kind === "xls";
   const tabular = isText || isSheet || kind === "pdf" || kind === "image" || kind === "json";
@@ -196,7 +197,12 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
             <RotateCcw className="size-3.5" aria-hidden />
           </button>
         </div>
-        {dirty && <p className="text-[11px] text-muted">La relecture recalcule les colonnes : vos renommages et types sont remis à zéro.</p>}
+        {dirty && (
+          <p className="text-[11px] text-muted">
+            La relecture recalcule les colonnes : vos renommages et types sont remis à zéro
+            {edits > 0 && <span className="text-warning">, et vos {edits} correction(s) de cellules perdues</span>}.
+          </p>
+        )}
       </div>
     </Panel>
   );

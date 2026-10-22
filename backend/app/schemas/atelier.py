@@ -195,7 +195,7 @@ class ConversionCreatedData(BaseModel):
 class ConversionUpdatedData(BaseModel):
     rows: int
     columns: int
-    reason: Literal["options", "columns", "ai", "rename"]
+    reason: Literal["options", "columns", "cells", "ai", "rename"]
 
 
 class ConversionSentData(BaseModel):

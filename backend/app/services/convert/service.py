@@ -11,6 +11,8 @@ from dataclasses import dataclass
 
 from app.schemas.atelier import AtelierTable, ConvertFileResult
 from app.schemas.convert import (
+    CellEdit,
+    CellValue,
     Column,
     Conversion,
     ExportFormat,
@@ -112,16 +114,47 @@ class ConversionService:
                     row[col.key] = coerce(row.get(col.key), col.type, conv.options.decimal, conv.options.date_order)
         conv.table_columns = [c.model_copy(update={"label": c.label.strip()}) for c in columns]
         conv.columns = len([c for c in columns if c.include])
-        if conv.statement is not None:
-            conv.statement = statement.summarize(
-                Table(columns=conv.table_columns, rows=conv.table_rows),
-                conv.statement.opening_balance,
-                conv.statement.closing_balance,
-                conv.statement.bank,
-            )
+        _resummarize(conv)
         saved = self.store.save(conv)
         self._updated(saved, "columns")
         return saved
+
+    # --- cellules ----------------------------------------------------------------------------------
+
+    def edit_cells(self, conversion_id: str, edits: list[CellEdit]) -> tuple[Conversion, list[int]]:
+        """Corrige des cellules (libellé, date, montant…) ; renvoie la conversion et les lignes touchées.
+
+        La valeur saisie est convertie dans le type de la colonne ; une saisie qui ne s'y convertit pas est
+        refusée (422) plutôt que gardée en texte. Dans un relevé, Débit / Crédit restent positifs et Montant
+        (signé) les suit — et inversement. La valeur lue dans le fichier est gardée dans `edited` (« ligne:clé »).
+        """
+        conv = self.store.get(conversion_id)
+        columns = {c.key: c for c in conv.table_columns}
+        by_role = {c.role: c.key for c in conv.table_columns if c.role in ("debit", "credit", "amount")}
+        order = "dmy" if conv.options.date_order == "auto" else conv.options.date_order
+        changed: dict[int, str] = {}  # ligne → « debit_credit » ou « amount » : ce qui commande les autres
+        for edit in edits:
+            if edit.row >= len(conv.table_rows):
+                raise ConvertError("Cette ligne n'existe plus : rechargez la page.", 409)
+            col = columns.get(edit.key)
+            if col is None:
+                raise ConvertError("Cette colonne n'existe plus : rechargez la page.", 409)
+            value = entered_value(edit.value, col, conv.options.decimal, order)
+            if col.role in ("debit", "credit") and isinstance(value, float):
+                value = abs(value)
+            _set_cell(conv, edit.row, edit.key, value)
+            if col.role in ("debit", "credit"):
+                changed[edit.row] = "debit_credit"
+            elif col.role == "amount":
+                changed.setdefault(edit.row, "amount")
+        for row, driver in changed.items():
+            _reconcile(conv, row, by_role, driver)
+        if len(conv.edited) > MAX_EDITED:
+            raise ConvertError(f"Trop de cellules corrigées (plus de {MAX_EDITED}) : corrigez plutôt le fichier.")
+        _resummarize(conv)
+        saved = self.store.save(conv)
+        self._updated(saved, "cells")
+        return saved, sorted({e.row for e in edits})
 
     def rename(self, conversion_id: str, name: str) -> Conversion:
         conv = self.store.get(conversion_id)
@@ -199,6 +232,88 @@ class ConversionService:
             rows=conv.rows,
             columns=conv.columns,
             warnings=conv.warnings,
+        )
+
+
+MAX_EDITED = 20_000
+ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+_EXPECTED = {
+    "number": "un nombre",
+    "currency": "un montant (ex. 21,73)",
+    "date": "une date (JJ/MM/AAAA)",
+    "boolean": "oui ou non",
+}
+
+
+def entered_value(value: CellValue, col: Column, decimal: str, order: str) -> CellValue:
+    """Valeur saisie convertie dans le type de la colonne ; vide → None ; saisie incompatible → ConvertError."""
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return None
+    if col.type == "text":
+        return " ".join(str(value).split())
+    if col.type in ("number", "currency") and isinstance(value, bool):
+        raise ConvertError(f"« {value} » n'est pas {_EXPECTED[col.type]} pour la colonne {col.label}.")
+    out = coerce(value, col.type, decimal, order)
+    if not _converted(out, col.type):
+        shown = str(out) if len(str(out)) <= 40 else str(out)[:39] + "…"
+        raise ConvertError(f"« {shown} » n'est pas {_EXPECTED[col.type]} pour la colonne {col.label}.")
+    if isinstance(out, float):
+        out = round(out, 2) if col.type == "currency" else out
+    return out
+
+
+def _converted(value: CellValue, type_: str) -> bool:
+    """Vrai si `coerce` a bien converti la valeur dans le type (sinon il l'a gardée en texte)."""
+    if type_ in ("number", "currency"):
+        return isinstance(value, int | float) and not isinstance(value, bool)
+    if type_ == "date":
+        return isinstance(value, str) and ISO_DATE.match(value) is not None
+    if type_ == "boolean":
+        return isinstance(value, bool)
+    return True
+
+
+def _set_cell(conv: Conversion, row: int, key: str, value: CellValue) -> None:
+    """Écrit une cellule en gardant la valeur lue dans le fichier ; revenir à celle-ci efface la marque."""
+    current = conv.table_rows[row].get(key)
+    if current == value and type(current) is type(value):
+        return
+    ref = f"{row}:{key}"
+    if ref not in conv.edited:
+        conv.edited[ref] = current
+    conv.table_rows[row][key] = value
+    original = conv.edited[ref]
+    if original == value and type(original) is type(value):
+        del conv.edited[ref]
+
+
+def _reconcile(conv: Conversion, row: int, by_role: dict[object, str], driver: str) -> None:
+    """Relevé : Montant = Crédit − Débit, ou Débit / Crédit déduits du Montant saisi."""
+    values = conv.table_rows[row]
+
+    def num(key: str | None) -> float | None:
+        v = values.get(key) if key else None
+        return float(v) if isinstance(v, int | float) and not isinstance(v, bool) else None
+
+    debit, credit, amount = by_role.get("debit"), by_role.get("credit"), by_role.get("amount")
+    if driver == "debit_credit" and amount and (debit or credit):
+        d, c = num(debit), num(credit)
+        _set_cell(conv, row, amount, None if d is None and c is None else round((c or 0.0) - (d or 0.0), 2))
+    elif driver == "amount" and amount and debit and credit:
+        a = num(amount)
+        _set_cell(conv, row, debit, round(-a, 2) if a is not None and a < 0 else None)
+        _set_cell(conv, row, credit, round(a, 2) if a is not None and a > 0 else None)
+
+
+def _resummarize(conv: Conversion) -> None:
+    """Synthèse du relevé (totaux, contrôle des soldes) recalculée sur les lignes."""
+    if conv.statement is not None:
+        conv.statement = statement.summarize(
+            Table(columns=conv.table_columns, rows=conv.table_rows),
+            conv.statement.opening_balance,
+            conv.statement.closing_balance,
+            conv.statement.bank,
         )
 
 

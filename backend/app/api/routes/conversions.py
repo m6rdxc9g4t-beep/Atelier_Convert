@@ -11,9 +11,12 @@ from pydantic import ValidationError
 
 from app.api.deps import AIServiceDep, ConversionsDep, OcrDep, SettingsDep, TabDep
 from app.schemas.convert import (
+    CellsResult,
+    CellsUpdate,
     ColumnsUpdate,
     ConversionSummary,
     ConversionView,
+    EditedRow,
     ExportFormat,
     ParseOptions,
     RenameRequest,
@@ -101,6 +104,16 @@ async def set_columns(conversion_id: str, body: ColumnsUpdate, service: Conversi
     """Noms, types, ordre et colonnes incluses."""
     conv = await asyncio.to_thread(service.update_columns, conversion_id, body.columns)
     return service.store.view(conv)
+
+
+@router.patch("/conversions/{conversion_id}/cells", response_model=CellsResult)
+async def edit_cells(conversion_id: str, body: CellsUpdate, service: ConversionsDep) -> CellsResult:
+    """Corrige des cellules (libellé, date, montant…). Dans un relevé, Montant suit Débit / Crédit."""
+    conv, touched = await asyncio.to_thread(service.edit_cells, conversion_id, body.edits)
+    return CellsResult(
+        conversion=service.store.view(conv),
+        rows=[EditedRow(index=i, values=conv.table_rows[i]) for i in touched],
+    )
 
 
 @router.put("/conversions/{conversion_id}/name", response_model=ConversionView)

@@ -90,6 +90,8 @@ export interface ConversionView extends ConversionSummary {
   preview: Record<string, CellValue>[];
   preview_truncated: boolean;
   has_text: boolean;
+  /** Cellules corrigées à la main : « ligne:clé » → valeur lue dans le fichier (vidé par « Relire le fichier »). */
+  edited: Record<string, CellValue>;
 }
 
 export interface TabProject {
@@ -104,6 +106,24 @@ export interface TabStatus {
   directory: string;
   projects: TabProject[];
   detail: string | null;
+}
+
+/** Correction d'une cellule : `value` saisie (« 21,73 », « 18/08/2026 »), convertie par le serveur. */
+export interface CellEdit {
+  row: number;
+  key: string;
+  value: CellValue;
+}
+
+/** Réponse de `PATCH /conversions/{id}/cells` : conversion et lignes modifiées (complètes). */
+export interface CellsResult {
+  conversion: ConversionView;
+  rows: { index: number; values: Record<string, CellValue> }[];
+}
+
+/** Référence d'une cellule corrigée dans `ConversionView.edited`. */
+export function cellRef(row: number, key: string): string {
+  return `${row}:${key}`;
 }
 
 export interface SendToTabResult {
