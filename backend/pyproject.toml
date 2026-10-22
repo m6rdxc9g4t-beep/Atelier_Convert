@@ -1,0 +1,16 @@
+[project]
+name = "atelier-convert-backend"
+version = "0.1.0"
+description = "Backend FastAPI d’Atelier Convert : conversion de relevés et fichiers (PDF, CSV, TXT, XLSX, OFX, QIF) vers des tables pour Atelier Tab."
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

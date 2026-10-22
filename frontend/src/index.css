@@ -1,0 +1,167 @@
+@import "tailwindcss";
+/* Design system de la Suite Atelier : copies verbatim d'Atelier_Projets/design-system (docs/SUITE.md §1.1). */
+@import "./styles/atelier-ds/colors.css";
+@import "./styles/atelier-ds/light.css";
+@import "./styles/atelier-ds/dark.css";
+
+/* Le mode sombre suit la classe .dark posée sur <html> (avec data-theme="dark", voir useTheme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Signature d'Atelier Convert (docs/SUITE.md §1.7) : or bronze #C9951D.
+ * atelier-brand.css (copie verbatim, jamais modifiée ici) ne la connaît pas encore : elle est déclarée ici
+ * avec la même forme que les autres apps, à reporter dans la source (Atelier_Projets/design-system/brand/).
+ * `:root[…]` l'emporte sur le `:root { --atelier-signature: … }` neutre de la marque, chargée après.
+ */
+:root {
+  --atelier-sig-convert: #c9951d;
+}
+:root[data-atelier-app="convert"],
+[data-atelier-app="convert"] {
+  --atelier-signature: var(--atelier-sig-convert);
+  --atelier-signature-contrast: #0b0b0f;
+}
+
+/*
+ * Habillage de l'application (docs/SUITE.md §1.2 et §1.7, charte « néon monochrome ») : mêmes noms de jetons
+ * qu'Atelier Viz ; leurs valeurs viennent des jetons --atelier-* d'atelier-brand.css, tous dérivés de la
+ * signature or (data-atelier-app="convert" sur <html>), dans les deux thèmes.
+ */
+:root,
+.dark,
+[data-theme] {
+  --bg: var(--atelier-bg);
+  --sidebar: var(--atelier-sidebar);
+  --surface: var(--atelier-surface);
+  --surface-2: var(--atelier-surface-2);
+  --surface-3: var(--atelier-surface-3);
+  --field: var(--atelier-field);
+  /* Trait par défaut (champs, boutons secondaires, panneaux) ; contour des cartes : --border-strong ; séparateurs : --line. */
+  --border: var(--atelier-border-soft);
+  --border-strong: var(--atelier-border);
+  --line: var(--atelier-line);
+  --fg: var(--atelier-text);
+  --muted: var(--atelier-muted);
+  --grid: var(--atelier-line);
+  /* Succès / danger : couleurs de statut rapprochées de l'encre (comme le bouton « danger » du design system), ≥ 4,5:1. */
+  --positive: color-mix(in oklab, var(--status-closed) 72%, var(--text-primary));
+  --negative: color-mix(in oklab, var(--status-rejected) 72%, var(--text-primary));
+  --warning: color-mix(in oklab, var(--status-hold) 70%, var(--text-primary));
+
+  /*
+   * Accent = signature : fonds pleins (sélection, barre de progression), --accent-fg = encre posée dessus (quasi noir).
+   * Texte, icônes fines et bordures de sélection : --accent-ink (assombri en clair, ≥ 4,5:1 ; éclairci en sombre).
+   * Fond actif : --accent-soft ; survol : --accent-faint ; focus : trait signature (+ halo --atelier-focus sur les champs).
+   */
+  --accent: var(--atelier-signature);
+  --accent-fg: var(--atelier-signature-contrast);
+  --accent-ink: var(--atelier-ink);
+  --accent-soft: var(--atelier-signature-soft);
+  --accent-faint: var(--atelier-signature-faint);
+  --focus: var(--atelier-signature);
+}
+
+/* Forme et typographie (docs/SUITE.md §1.3) : pile système, aucune police téléchargée. */
+:root {
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 10px;
+  --ds-radius-lg: 16px;
+  --ds-font-sans: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ds-font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sidebar: var(--sidebar);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-field: var(--field);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-faint: var(--accent-faint);
+  --color-focus: var(--focus);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+  --font-sans: var(--ds-font-sans);
+  --font-mono: var(--ds-font-mono);
+  --radius-md: var(--ds-radius-sm);
+  --radius-lg: var(--ds-radius-md);
+  --radius-xl: var(--ds-radius-lg);
+}
+
+body {
+  /* Fine grille + lueur en haut, dans la couleur de l'app (les deux thèmes). --atelier-backdrop contient des
+     tailles de motif : il ne s'utilise que dans le raccourci `background`, jamais dans `background-image`. */
+  background: var(--atelier-backdrop), var(--bg);
+  background-attachment: fixed;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Charte « néon monochrome » (docs/SUITE.md §1.7), classes d'habillage :
+ * - cartes et panneaux : `atelier-card` (atelier-brand.css : surface, trait néon, halo) ;
+ * - menus, popovers, modales : `atelier-pop` (trait néon, halo fort) ;
+ * - bouton principal : `atelier-btn-primary` (atelier-brand.css : plein en clair, contour néon en sombre) ;
+ * - navigation active : `atelier-nav-active` (atelier-brand.css) ; titre de page : `atelier-title`.
+ */
+.atelier-pop {
+  border-color: var(--atelier-border);
+  box-shadow: var(--atelier-glow-strong);
+}
+
+.atelier-title {
+  text-shadow: var(--atelier-text-glow);
+}
+
+.atelier-btn-primary:is(:hover, :focus-visible):not(:disabled) {
+  filter: brightness(1.08);
+}
+
+/* Champs de l'interface : trait signature et halo au focus. */
+:is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), textarea, select):focus-visible {
+  outline: none;
+  border-color: var(--atelier-signature);
+  box-shadow: var(--atelier-focus);
+}
+
+input[type="checkbox"] {
+  accent-color: var(--atelier-signature);
+}
+
+/* Zone de dépôt : trait pointillé néon, plus lumineux quand un fichier la survole. */
+.convert-drop {
+  border: 1.5px dashed var(--atelier-border);
+  background:
+    radial-gradient(70% 90% at 50% 0%, var(--atelier-signature-faint), transparent 70%),
+    var(--atelier-surface);
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+.convert-drop[data-over="true"] {
+  border-style: solid;
+  border-color: var(--atelier-signature);
+  box-shadow: var(--atelier-glow-strong);
+}
+
+/* Tableau d'aperçu : en-tête collant, chiffres alignés. */
+.convert-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--atelier-surface-2);
+}
+.convert-table td.num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}

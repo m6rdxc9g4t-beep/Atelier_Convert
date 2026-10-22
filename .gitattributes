@@ -1,0 +1,31 @@
+# Fins de ligne (docs/SUITE.md §9.3) : LF partout, y compris dans un clone Windows, pour que le dépôt ne paraisse
+# jamais « modifié » (sinon la mise à jour automatique de l'app de bureau recompilerait à chaque lancement, §8).
+* text=auto eol=lf
+
+# Scripts Windows : CRLF (PowerShell 5.1, cmd).
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.vbs text eol=crlf
+
+# Binaires : jamais convertis.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.icns binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.zip binary
+*.xlsx binary
+*.xls binary
+*.pptx binary
+
+# Fichiers d'exemple (relevés CSV / TXT / OFX / QIF) : gardés octet pour octet (CRLF, Windows-1252…), jamais
+# normalisés. Un clone Windows ne les voit pas « modifiés » pour autant (§9.3).
+samples/** -text

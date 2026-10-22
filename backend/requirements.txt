@@ -1,0 +1,12 @@
+fastapi>=0.132  # 0.132 : corps JSON refusé sans Content-Type JSON (strict_content_type)
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+httpx>=0.27
+anthropic>=0.40
+pandas>=2.2
+openpyxl>=3.1
+xlrd>=2.0  # anciens classeurs Excel (.xls)
+python-multipart>=0.0.12
+pdfplumber>=0.11  # texte et positions des mots des PDF (relevés bancaires)
+charset-normalizer>=3.3  # encodage des CSV / TXT (UTF-8, Windows-1252, Latin-1…)
