@@ -193,6 +193,8 @@ class Txn:
     guessed_sign: bool = False
     page: int = 1
     placed: list[tuple[Word, float]] = field(default_factory=list)
+    garbled: list[str] = field(default_factory=list)
+    """Jetons illisibles dans les colonnes de montants (OCR : « 412 » pour « 1,12 »)."""
 
     @property
     def label(self) -> str:
@@ -323,8 +325,14 @@ def extract_statement(lines: list[Line], full_text: str, options: ParseOptions) 
         if start is not None and not amounts:
             # Date sans montant sur la ligne : opération dont le montant est sur la ligne suivante.
             date_raw, value_raw, used = start
+            rest = line.words[used:]
+            garbled = [w for w in rest if _garbled_amount(w, anchors)]
             txn = Txn(
-                date_raw=date_raw, value_raw=value_raw, label_parts=[w.text for w in line.words[used:]], page=line.page
+                date_raw=date_raw,
+                value_raw=value_raw,
+                label_parts=[w.text for w in rest if w not in garbled],
+                page=line.page,
+                garbled=[w.text for w in garbled],
             )
             txns.append(txn)
             current = txn
@@ -338,7 +346,7 @@ def extract_statement(lines: list[Line], full_text: str, options: ParseOptions) 
                     current.placed = placed
                     rest = [w.text for w in line.words if all(w is not p for p, _ in placed)]
                     current.label_parts.extend(rest)
-                elif not amounts and len(line.text) <= 120:
+                elif not amounts and len(line.text) <= 120 and _meaningful(line):
                     current.label_parts.append(line.text)
                 else:
                     current = None
@@ -346,7 +354,8 @@ def extract_statement(lines: list[Line], full_text: str, options: ParseOptions) 
                 continue
         current = None
 
-    txns = [t for t in txns if t.placed]
+    # Une opération dont le montant est illisible (OCR) est gardée, sans montant, et signalée.
+    txns = [t for t in txns if t.placed or t.garbled]
     if len(txns) < 2:
         return None
 
@@ -369,7 +378,9 @@ def extract_statement(lines: list[Line], full_text: str, options: ParseOptions) 
             "libelle": t.label or None,
             "debit": round(t.debit, 2) if t.debit is not None else None,
             "credit": round(t.credit, 2) if t.credit is not None else None,
-            "montant": round((t.credit or 0.0) - (t.debit or 0.0), 2),
+            "montant": round((t.credit or 0.0) - (t.debit or 0.0), 2)
+            if t.credit is not None or t.debit is not None
+            else None,
         }
         if has_value:
             row["date_de_valeur"] = (
@@ -378,6 +389,14 @@ def extract_statement(lines: list[Line], full_text: str, options: ParseOptions) 
         if has_balance:
             row["solde"] = round(t.balance, 2) if t.balance is not None else None
         rows.append(row)
+    unreadable = [t for t in txns if not t.placed]
+    if unreadable:
+        listed = ", ".join(f"{t.date_raw} {t.label[:30]} (lu « {' '.join(t.garbled)} »)" for t in unreadable[:3])
+        warnings.append(
+            f"{len(unreadable)} opération(s) sans montant lisible : {listed}. Complétez-les dans Atelier Tab après "
+            "l'envoi, ou relisez un scan plus net ; s'il n'y en a qu'une, l'écart du contrôle des soldes "
+            "donne son montant."
+        )
     if unresolved:
         warnings.append(
             f"{unresolved} date(s) sans année n'ont pas pu être complétées : indiquez l'année dans les options."
@@ -387,6 +406,21 @@ def extract_statement(lines: list[Line], full_text: str, options: ParseOptions) 
     table = Table(columns=columns, rows=rows, warnings=warnings, detected="")
     table.statement = summarize(table, opening, closing, detect_bank(full_text))
     return table
+
+
+def _garbled_amount(word: Word, anchors: list[Anchor] | None) -> bool:
+    """Nombre illisible dans une colonne de montants (au moins deux chiffres, mais pas un montant)."""
+    zones = [a for a in anchors or [] if a.role in AMOUNT_ROLES]
+    if not zones or amount_text(word.text) or sum(c.isdigit() for c in word.text) < 2:
+        return False
+    if short_date(word.text) or _full_date(word.text):
+        return False
+    return word.x0 >= min(a.x0 for a in zones) - 20
+
+
+def _meaningful(line: Line) -> bool:
+    """Suite de libellé : au moins un mot de 3 caractères alphanumériques (pas un trait ni du bruit d'OCR)."""
+    return any(sum(c.isalnum() for c in w.text) >= 3 for w in line.words)
 
 
 def _in_amount_zone(word: Word, anchors: list[Anchor] | None) -> bool:

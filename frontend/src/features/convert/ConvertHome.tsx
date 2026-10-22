@@ -1,4 +1,4 @@
-import { ArrowRight, FileSpreadsheet, FileText, Landmark, Sparkles } from "lucide-react";
+import { ArrowRight, FileSpreadsheet, FileText, Landmark, ScanText, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { toast } from "../../components/Toaster";
@@ -9,6 +9,7 @@ import type { ConversionSummary, SampleInfo } from "../../types/convert";
 import { Dropzone } from "./Dropzone";
 
 const SAMPLE_ICONS: Record<string, typeof FileText> = { pdf: FileText, csv: FileSpreadsheet, ofx: Landmark };
+const SCAN_ICON = ScanText;
 
 /** Accueil : zone de dépôt, exemples, conversions récentes. */
 export function ConvertHome() {
@@ -63,7 +64,7 @@ export function ConvertHome() {
           </h3>
           <ul className="mt-3 space-y-2">
             {samples.map((s) => {
-              const Icon = SAMPLE_ICONS[s.name.split(".").pop() ?? ""] ?? FileText;
+              const Icon = s.name.includes("scanne") ? SCAN_ICON : (SAMPLE_ICONS[s.name.split(".").pop() ?? ""] ?? FileText);
               return (
                 <li key={s.name}>
                   <button

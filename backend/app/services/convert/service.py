@@ -57,6 +57,7 @@ class ConversionService:
                 "rows": conv.rows,
                 "columns": conv.columns,
                 "statement": table.statement is not None,
+                "ocr": info.ocr,
                 "origin": origin,
             },
         )

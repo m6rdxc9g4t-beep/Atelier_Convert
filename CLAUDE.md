@@ -20,7 +20,7 @@ Tab. Même architecture et même design qu'Atelier Viz (FastAPI + React), dont i
 |---|---|
 | Frontend | React 19 + TypeScript strict + Vite (5176), Tailwind v4, lucide-react |
 | Backend | FastAPI (8010), Pydantic v2, pydantic-settings, httpx |
-| Lecture | pdfplumber (mots + positions), pandas + openpyxl / xlrd, charset-normalizer, csv |
+| Lecture | pdfplumber (mots + positions), pandas + openpyxl / xlrd, charset-normalizer, csv ; OCR : Tesseract (binaire du système) + pypdfium2 + Pillow |
 | Stockage | `backend/data/conversions/<id>.json` + `backend/data/sources/<id>.<ext>` (écritures atomiques) |
 | IA | `AIService` → Ollama / Claude (`ClaudeCliProvider` via `claude -p`, ou `AnthropicProvider`) — copie de Viz |
 
@@ -35,6 +35,12 @@ Tab. Même architecture et même design qu'Atelier Viz (FastAPI + React), dont i
   (positifs), `montant` (signé), `solde`, puis les autres colonnes. Ne pas les renommer : tests, Tab et exports en dépendent.
 - `pipeline.py` : `convert(data, filename, options)` choisit le lecteur (`detect_kind` : contenu puis extension) et applique
   `profile` (auto / statement / raw). Tout nouveau format : lecteur + extension dans `EXTENSIONS` + test + `ACCEPT` du front.
+- `ocr.py` : Tesseract lancé **sans shell**, image sur l'entrée standard, TSV sur la sortie (`-c tessedit_create_tsv=1`,
+  `--psm 6`), délai borné ; mots convertis en `Word` en points (PDF : `dpi/72` ; image : largeur A4) pour que `statement.py`
+  les lise comme un PDF texte. `fix_token` ne corrige que des jetons en forme de montant ou de date (jamais un libellé).
+  Exécutable cherché hors PATH (Finder) ; jamais un chemin relatif. `pipeline._needs_ocr` : auto = moins de 20 caractères
+  par page. Une ligne datée au montant illisible (`Txn.garbled`) est gardée sans montant et signalée. Tests : moteur simulé
+  (`runner`), tests réels ignorés sans Tesseract ; `conftest` coupe l'OCR (`convert_ocr_enabled=False`).
 - `writers.py` : CSV français = `;`, virgule décimale, `JJ/MM/AAAA`, UTF-8 **avec BOM** (Excel FR) ; seules les colonnes
   incluses sont écrites.
 - `tab.py` : **écrit un seul fichier** `tables/<tbl_id>.json` dans le dossier de Tab (format `atelier_tab` v1,

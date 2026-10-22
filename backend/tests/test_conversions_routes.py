@@ -59,7 +59,7 @@ def test_upload_and_view(client: TestClient) -> None:
 
 
 def test_upload_refusals(client: TestClient, settings: Settings) -> None:
-    r = client.post("/api/conversions", files={"file": ("photo.png", b"\x89PNG....", "image/png")})
+    r = client.post("/api/conversions", files={"file": ("video.mp4", b"\x00\x00\x00 ftypisom", "video/mp4")})
     assert r.status_code == 415 and "Formats acceptés" in r.json()["detail"]
     r = client.post("/api/conversions", files={"file": ("vide.csv", b"", "text/csv")})
     assert r.status_code == 422
@@ -301,7 +301,7 @@ def test_structure_bad_ai_reply(client: TestClient, override_ai) -> None:  # typ
 
 def test_samples(client: TestClient) -> None:
     names = [s["name"] for s in client.get("/api/samples").json()]
-    assert names == ["releve-mars-2026.pdf", "export-banque.csv", "operations.ofx"]
+    assert names == ["releve-mars-2026.pdf", "export-banque.csv", "operations.ofx", "releve-scanne.pdf"]
     r = client.post("/api/samples/releve-mars-2026.pdf")
     assert r.status_code == 201 and r.json()["statement"]["balance_check"] == "ok"
     assert client.post("/api/samples/inconnu.csv").status_code == 404

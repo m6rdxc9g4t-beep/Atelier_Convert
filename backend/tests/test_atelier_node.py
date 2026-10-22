@@ -68,6 +68,7 @@ def test_convert_file_table_and_events(client: TestClient) -> None:
         "rows": 18,
         "columns": 6,
         "statement": True,
+        "ocr": False,
         "origin": "workflow",
     }
 
@@ -76,7 +77,8 @@ def test_convert_file_errors(client: TestClient) -> None:
     r = client.post("/api/atelier/conversions", json={"filename": "x.csv", "content_base64": "%%%"})
     assert r.status_code == 422 and r.json()["code"] == "VALIDATION"
     r = client.post(
-        "/api/atelier/conversions", json={"filename": "x.png", "content_base64": base64.b64encode(b"\x89PNG").decode()}
+        "/api/atelier/conversions",
+        json={"filename": "x.mp4", "content_base64": base64.b64encode(b"\x00\x00\x00 ftypisom").decode()},
     )
     assert r.status_code == 415 and r.json()["code"] == "VALIDATION"
     r = client.get("/api/atelier/conversions/0123456789ab/table")

@@ -49,6 +49,10 @@ jobs:
           git status --porcelain | tee "$RUNNER_TEMP/journaux/git-status.log"
           test -z "$(git status --porcelain)"
 
+      - name: Tesseract (tests d'OCR réels, Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get install -y -q tesseract-ocr tesseract-ocr-fra
+
       - name: Backend (ruff, pytest)
         working-directory: backend
         run: |

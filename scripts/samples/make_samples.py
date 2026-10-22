@@ -2,7 +2,7 @@
 
 Toutes les données sont fictives. À relancer seulement si les exemples changent :
 
-    cd backend && . .venv/bin/activate && pip install reportlab
+    cd backend && . .venv/bin/activate && pip install reportlab   # pypdfium2 et Pillow viennent avec pdfplumber
     python ../scripts/samples/make_samples.py
 
 reportlab n'est pas une dépendance de l'application (les fichiers produits sont versionnés).
@@ -260,6 +260,30 @@ def scanned(path: Path) -> None:
     c.save()
 
 
+def scanned_statement(source: Path, pdf_path: Path, png_path: Path) -> None:
+    """Relevé « scanné » (PDF d'images, sans texte) et « photographié » (JPEG) : pour l'OCR.
+
+    Pages rendues en niveaux de gris, très légèrement penchées et floues, comme un vrai scan.
+    """
+    import random
+
+    import pypdfium2 as pdfium
+    from PIL import Image, ImageFilter
+
+    random.seed(7)
+    doc = pdfium.PdfDocument(str(source))
+    pages = []
+    for i in range(len(doc)):
+        img = doc[i].render(scale=200 / 72).to_pil().convert("L")
+        img = img.rotate(0.35 if i == 0 else -0.25, resample=Image.Resampling.BICUBIC, expand=False, fillcolor=255)
+        img = img.point(lambda v: min(v, 244))  # papier légèrement gris
+        pages.append(img.filter(ImageFilter.GaussianBlur(0.4)))
+    doc.close()
+    pages[0].save(pdf_path, "PDF", resolution=200, save_all=True, append_images=pages[1:], quality=60)
+    photo = pages[0].resize((pages[0].width * 3 // 4, pages[0].height * 3 // 4), Image.Resampling.LANCZOS)
+    photo.save(png_path, "JPEG", quality=70, optimize=True)
+
+
 def main() -> None:
     SAMPLES.mkdir(exist_ok=True)
     FIXTURES.mkdir(parents=True, exist_ok=True)
@@ -271,6 +295,7 @@ def main() -> None:
     ruled_table(FIXTURES / "tableau.pdf")
     bank_qif(FIXTURES / "export.qif")
     scanned(FIXTURES / "scan.pdf")
+    scanned_statement(SAMPLES / "releve-mars-2026.pdf", SAMPLES / "releve-scanne.pdf", FIXTURES / "releve-photo.jpg")
     print("Exemples écrits dans", SAMPLES, "et", FIXTURES)
 
 

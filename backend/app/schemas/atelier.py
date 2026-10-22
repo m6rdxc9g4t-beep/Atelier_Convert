@@ -188,6 +188,7 @@ class ConversionCreatedData(BaseModel):
     rows: int
     columns: int
     statement: bool = Field(description="Relevé bancaire reconnu (colonnes normalisées).")
+    ocr: bool = Field(default=False, description="Texte obtenu par reconnaissance de caractères (OCR).")
     origin: Literal["interface", "workflow", "ai"] = "interface"
 
 

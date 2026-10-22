@@ -50,6 +50,7 @@ def settings(tmp_path: Path) -> Settings:
         anthropic_api_key=None,
         data_dir=tmp_path / "data",
         atelier_tab_data_dir=tmp_path / "Atelier_Tab",  # jamais le vrai dossier d'Atelier Tab
+        convert_ocr_enabled=False,  # jamais le vrai Tesseract (tests OCR : moteur simulé, ou réel s'il est installé)
         allowed_hosts=["testserver"],  # Host envoyé par TestClient ; le garde local reste actif (test_local_only.py)
         _env_file=None,
     )

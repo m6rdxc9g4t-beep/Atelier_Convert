@@ -23,6 +23,7 @@ from app.core.local_only import LocalOnlyMiddleware
 from app.services.ai import AIProviderError
 from app.services.atelier import AtelierError, EventJournal, IdempotencyStore
 from app.services.atelier.errors import code_for, is_atelier_path, text_detail, validation_message
+from app.services.convert.ocr import OcrEngine
 from app.services.convert.pipeline import ConvertError, Limits
 from app.services.convert.service import ConversionService
 from app.services.convert.store import ConversionNotFound, ConversionStore
@@ -47,11 +48,24 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.journal = EventJournal(data_dir / "atelier_events.jsonl")
         app.state.idempotency = IdempotencyStore(data_dir / "atelier_idempotency.json")
         app.state.tab = TabFolder(settings.tab_dir)
+        app.state.ocr = OcrEngine(
+            executable=settings.convert_ocr_tesseract,
+            languages=settings.convert_ocr_languages,
+            dpi=settings.convert_ocr_dpi,
+            timeout=settings.convert_ocr_timeout_seconds,
+            tessdata=settings.convert_ocr_tessdata,
+            enabled=settings.convert_ocr_enabled,
+        )
         app.state.conversions = ConversionService(
             ConversionStore(data_dir, preview_rows=settings.convert_preview_rows),
             app.state.tab,
             app.state.journal,
-            Limits(max_rows=settings.convert_max_rows, max_pdf_pages=settings.convert_max_pdf_pages),
+            Limits(
+                max_rows=settings.convert_max_rows,
+                max_pdf_pages=settings.convert_max_pdf_pages,
+                max_ocr_pages=settings.convert_ocr_max_pages,
+                ocr=app.state.ocr,
+            ),
         )
         yield
         await app.state.ai_service.aclose()

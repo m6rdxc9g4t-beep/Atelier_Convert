@@ -19,6 +19,7 @@ SAMPLES: dict[str, tuple[str, str]] = {
         "Export « ; » en Windows-1252 avec préambule, comme ceux des banques.",
     ),
     "operations.ofx": ("Fichier OFX", "Format d'échange Money / Quicken."),
+    "releve-scanne.pdf": ("Relevé scanné (OCR)", "PDF d'images sans texte : lu par reconnaissance de caractères."),
 }
 
 

@@ -4,7 +4,8 @@
 
 Application **locale** de la Suite Atelier qui transforme vos fichiers en **tables propres pour Atelier Tab** :
 un relevé bancaire en PDF devient Date · Libellé · Débit · Crédit · Montant (· Solde), un export CSV ou TXT de
-banque est nettoyé et typé, un classeur Excel, un fichier OFX / QIF ou un JSON devient une table.
+banque est nettoyé et typé, un classeur Excel, un fichier OFX / QIF ou un JSON devient une table — et un relevé
+**scanné ou photographié** est lu par **OCR** (Tesseract, sur la machine).
 Ensuite : **export** (CSV français, CSV standard, TXT, XLSX, JSON `atelier-table/1`) ou **« Envoyer dans Atelier Tab »**,
 qui crée directement la table dans le projet choisi.
 
@@ -33,10 +34,15 @@ npm run dev                                             # http://127.0.0.1:5176
 # 3. Optionnel — IA
 ollama serve && ollama pull llama3.2                    # IA locale
 claude auth login                                       # Claude (mode « En ligne »), avec votre compte claude.ai
+
+# 4. Optionnel — OCR des relevés scannés et des photos
+brew install tesseract tesseract-lang                   # macOS
+winget install UB-Mannheim.TesseractOCR                 # Windows (cocher « French » dans l'installateur)
+sudo apt install tesseract-ocr tesseract-ocr-fra        # Linux
 ```
 
 Premier essai : **Convertir → Essayer avec un exemple** (`samples/` : un relevé PDF fictif sur deux pages, un export
-CSV Windows-1252 avec préambule, un fichier OFX).
+CSV Windows-1252 avec préambule, un fichier OFX, et le même relevé scanné pour l'OCR).
 
 ## Ce que sait lire Atelier Convert
 
@@ -44,7 +50,8 @@ CSV Windows-1252 avec préambule, un fichier OFX).
 |---|---|
 | **PDF de relevé bancaire** | Mots et positions (pdfplumber) : en-tête Date / Libellé / Débit / Crédit / Montant / Solde reconnu, sinon positions des montants ; libellés sur plusieurs lignes ; « 1 234,56 » recollé ; dates sans année complétées par la période du relevé ; « À reporter », « Total » ignorés ; soldes initial et final lus et **contrôlés** (solde initial + crédits − débits = solde final). |
 | PDF avec tableaux | Tableaux détectés page par page, réunis (en-têtes répétés retirés). |
-| PDF de texte | Une ligne par ligne, prête pour « Structurer avec l'IA ». PDF scanné (image) : signalé, pas d'OCR. |
+| PDF de texte | Une ligne par ligne, prête pour « Structurer avec l'IA ». |
+| **PDF scanné, photo** (JPG, PNG, TIFF, WebP, BMP) | **OCR** par Tesseract, sur la machine : pages rendues à 300 ppp, mots et positions reconnus puis lus exactement comme un PDF texte (relevé, contrôle des soldes). Automatique pour un PDF sans texte ; « Toujours » / « Jamais » dans les options. Chiffres mal lus corrigés (« 1O,5O » → « 10,50 ») ; une opération au montant illisible est gardée et signalée. Confiance moyenne affichée. |
 | **CSV / TXT** | Encodage (UTF-8, Windows-1252…), séparateur (`;` `,` tabulation `|`), préambule ignoré, en-tête détecté ; texte aligné par des espaces découpé en colonnes. |
 | **XLSX / XLS** | Feuille au choix, préambule et en-tête comme un CSV, dates Excel gardées. |
 | **OFX / QFX, QIF** | Opérations, références, catégories, solde final (OFX). |
@@ -55,6 +62,15 @@ et, quand les colonnes ressemblent à un relevé, **mise en forme normalisée** 
 désactiver par « Telle quelle ». Dans l'aperçu : renommer, écarter, retyper, réordonner les colonnes ; une valeur qui
 ne se convertit pas est surlignée et gardée telle quelle. Tout reste modifiable : « Relire le fichier » avec d'autres
 options (pages, année, séparateur, encodage, en-tête, lignes à ignorer, virgule décimale, ordre des dates).
+
+## OCR (relevés scannés et photos)
+
+Tesseract est lancé **sur la machine**, sans réseau ni fichier temporaire (image sur l'entrée standard). Langues :
+français + anglais par défaut ; sans le français, l'OCR marche mais lit moins bien les accents (Réglages le signale).
+Réglages : `CONVERT_OCR_TESSERACT` (chemin de l'exécutable si l'app ne le trouve pas — elle cherche le PATH, Homebrew,
+`/usr/local/bin`, `Program Files\Tesseract-OCR`), `CONVERT_OCR_LANGUAGES`, `CONVERT_OCR_TESSDATA`, `CONVERT_OCR_DPI`
+(300), `CONVERT_OCR_MAX_PAGES` (50), `CONVERT_OCR_ENABLED`. Un scan droit à 300 ppp donne les meilleurs résultats ;
+**vérifiez toujours** les montants : le contrôle des soldes signale une opération mal lue.
 
 ## Envoyer dans Atelier Tab
 
@@ -102,7 +118,7 @@ cd frontend && npm test && npm run build
 ```
 backend/
   main.py                       create_app() ; erreurs ; interface compilée servie sur /
-  app/services/convert/         values (nombres, dates, types), text, pdf, statement (relevés), bankfiles (OFX, QIF),
+  app/services/convert/         values (nombres, dates, types), text, pdf, ocr (Tesseract), statement (relevés), bankfiles (OFX, QIF),
                                 table, pipeline, writers (CSV, TXT, XLSX, atelier-table), tab (écriture vers Tab),
                                 store (historique), service, ai_structure
   app/services/ai/              Ollama, CLI Claude (isolée), API Anthropic, routage hors ligne / en ligne

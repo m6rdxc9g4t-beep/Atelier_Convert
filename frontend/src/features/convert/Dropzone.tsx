@@ -2,8 +2,8 @@ import clsx from "clsx";
 import { FileUp, LoaderCircle } from "lucide-react";
 import { type DragEvent, useId, useRef, useState } from "react";
 
-const FORMATS = ["PDF", "CSV", "TXT", "XLSX", "XLS", "OFX", "QIF", "JSON"];
-export const ACCEPT = ".pdf,.csv,.tsv,.txt,.prn,.dat,.xlsx,.xlsm,.xls,.ofx,.qfx,.qif,.json";
+const FORMATS = ["PDF", "CSV", "TXT", "XLSX", "XLS", "OFX", "QIF", "JSON", "JPG", "PNG", "TIFF"];
+export const ACCEPT = ".pdf,.csv,.tsv,.txt,.prn,.dat,.xlsx,.xlsm,.xls,.ofx,.qfx,.qif,.json,.png,.jpg,.jpeg,.tif,.tiff,.webp,.bmp";
 
 /** Zone de dépôt (glisser-déposer ou choix du fichier) ; un seul fichier à la fois. */
 export function Dropzone({ busy, onFile, compact = false }: { busy: boolean; onFile: (file: File) => void; compact?: boolean }) {
@@ -35,7 +35,9 @@ export function Dropzone({ busy, onFile, compact = false }: { busy: boolean; onF
       <div>
         <p className={clsx("font-semibold", compact ? "text-sm" : "text-lg")}>{busy ? "Conversion en cours…" : "Déposez un relevé ou un fichier"}</p>
         <p id={hintId} className="mt-1 text-xs text-muted">
-          Relevé bancaire en PDF, export CSV ou TXT, classeur Excel, fichier OFX ou QIF. Rien ne quitte la machine.
+          {busy
+            ? "Un document scanné est lu par OCR : quelques secondes par page."
+            : "Relevé bancaire en PDF (même scanné), photo, export CSV ou TXT, classeur Excel, fichier OFX ou QIF. Rien ne quitte la machine."}
         </p>
       </div>
       <button type="button" disabled={busy} onClick={() => input.current?.click()} aria-describedby={hintId} className="atelier-btn-primary rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50">

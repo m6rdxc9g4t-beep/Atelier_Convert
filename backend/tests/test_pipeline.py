@@ -262,8 +262,11 @@ def test_detect_kind() -> None:
     assert detect_kind("x.bin", b"%PDF-1.7") == "pdf"
     assert detect_kind("x.txt", b"OFXHEADER:100") == "ofx"
     assert detect_kind("x", b"!Type:Bank\n") == "qif"
+    assert detect_kind("scan.bin", b"\x89PNG\r\n") == "image"
+    assert detect_kind("photo.jpg", b"\xff\xd8\xff\xe0") == "image"
+    assert detect_kind("x", b"RIFF\x00\x00\x00\x00WEBPVP8") == "image"
     with pytest.raises(ConvertError) as err:
-        detect_kind("photo.png", b"\x89PNG")
+        detect_kind("video.mp4", b"\x00\x00\x00 ftypisom")
     assert err.value.status_code == 415
 
 

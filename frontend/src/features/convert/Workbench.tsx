@@ -105,6 +105,7 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
     src.pages ? `${src.pages} page(s)` : null,
     src.encoding ? `encodage ${src.encoding}` : null,
     src.delimiter ? `séparateur ${DELIMITER_LABELS[src.delimiter] ?? src.delimiter}` : null,
+    src.ocr ? `OCR ${src.ocr_languages ?? ""}${src.ocr_confidence !== null ? ` · confiance ${Math.round(src.ocr_confidence)} %` : ""}` : null,
   ].filter(Boolean);
 
   return (

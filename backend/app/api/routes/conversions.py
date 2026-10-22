@@ -9,7 +9,7 @@ from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile, sta
 from fastapi.responses import Response
 from pydantic import ValidationError
 
-from app.api.deps import AIServiceDep, ConversionsDep, SettingsDep, TabDep
+from app.api.deps import AIServiceDep, ConversionsDep, OcrDep, SettingsDep, TabDep
 from app.schemas.convert import (
     ColumnsUpdate,
     ConversionSummary,
@@ -24,6 +24,7 @@ from app.schemas.convert import (
     TabStatus,
 )
 from app.services.convert.ai_structure import excerpt, structure
+from app.services.convert.ocr import OcrStatus
 from app.services.convert.pipeline import ConvertError
 
 router = APIRouter(tags=["conversions"])
@@ -163,3 +164,9 @@ async def structure_with_ai(
 async def tab_status(tab: TabDep) -> TabStatus:
     """Projets d'Atelier Tab (lus dans son dossier de données)."""
     return await asyncio.to_thread(tab.status)
+
+
+@router.get("/ocr", response_model=OcrStatus)
+async def ocr_status(ocr: OcrDep, refresh: bool = False) -> OcrStatus:
+    """Reconnaissance de texte : Tesseract trouvé, version, langues installées (gardé 60 s ; `refresh` revérifie)."""
+    return await asyncio.to_thread(ocr.status, refresh)

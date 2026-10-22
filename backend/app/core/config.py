@@ -60,6 +60,17 @@ class Settings(BaseSettings):
     convert_max_pdf_pages: int = Field(default=300, ge=1, le=5000)
     convert_preview_rows: int = Field(default=200, ge=10, le=5000)
 
+    # Reconnaissance de texte (OCR) des PDF scannés et des images : Tesseract, sur la machine.
+    convert_ocr_enabled: bool = True
+    # Exécutable : chemin absolu, ou « tesseract » (PATH, puis Homebrew, /usr/local/bin, Program Files).
+    convert_ocr_tesseract: str = "tesseract"
+    # Dossier des langues (TESSDATA_PREFIX) si Tesseract ne trouve pas les siennes ; vide = celui de Tesseract.
+    convert_ocr_tessdata: Path | None = None
+    convert_ocr_languages: str = "fra+eng"
+    convert_ocr_dpi: int = Field(default=300, ge=100, le=600)
+    convert_ocr_max_pages: int = Field(default=50, ge=1, le=1000)
+    convert_ocr_timeout_seconds: float = Field(default=120.0, ge=5.0, le=1800.0)
+
     # Suite Atelier (docs/SUITE.md §4.4) : dossier de données d'Atelier Tab, où « Envoyer dans Atelier Tab »
     # écrit la table (tables/<id>.json). Tab surveille ce dossier et l'affiche aussitôt.
     atelier_tab_data_dir: Path = Path("~/Atelier_Tab")
@@ -74,6 +85,12 @@ class Settings(BaseSettings):
                 return json.loads(text)
             return [h.strip() for h in text.split(",") if h.strip()]
         return value
+
+    @field_validator("convert_ocr_tessdata", mode="before")
+    @classmethod
+    def _empty_path(cls, value: Any) -> Any:
+        """`CONVERT_OCR_TESSDATA=` (vide) = dossier de Tesseract, jamais le dossier courant."""
+        return None if isinstance(value, str) and not value.strip() else value
 
     @property
     def anthropic_configured(self) -> bool:

@@ -6,6 +6,7 @@ import { useProviders } from "../../hooks/useProviders";
 import { type ThemePreference, useTheme } from "../../hooks/useTheme";
 import { CLAUDE_MODELS, claudeModelLabel, ollamaChoices, ollamaSelected } from "../../lib/engine";
 import type { ClaudeModel, ProviderStatus } from "../../types/ai";
+import { OcrSection } from "./OcrSection";
 import { TabSection } from "./TabSection";
 import type { AppInfo } from "../../types/convert";
 
@@ -122,6 +123,7 @@ export function SettingsView({ info }: { info: AppInfo | null }) {
           « Structurer avec l'IA » ; « Auto » prend Claude en ligne quand il est disponible, sinon Ollama.
         </p>
       </section>
+      <OcrSection />
       <TabSection />
       {info && (
         <section className="atelier-card rounded-xl border border-border bg-surface p-5">

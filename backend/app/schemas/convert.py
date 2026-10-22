@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field, field_validator
 ColumnType = Literal["text", "number", "currency", "date", "boolean"]
 """Type d'une colonne : texte, nombre, montant (devise), date (AAAA-MM-JJ), case à cocher."""
 
-SourceKind = Literal["pdf", "csv", "txt", "xlsx", "xls", "ofx", "qif", "json"]
+SourceKind = Literal["pdf", "image", "csv", "txt", "xlsx", "xls", "ofx", "qif", "json"]
 
 PdfMode = Literal["auto", "statement", "tables", "text"]
 """Lecture d'un PDF : relevé bancaire (lignes datées + montants), tableaux détectés, ou texte brut ligne à ligne."""
@@ -44,6 +44,10 @@ class ParseOptions(BaseModel):
     date_order: Literal["auto", "dmy", "mdy", "ymd"] = "auto"
     pages: str | None = Field(default=None, max_length=100, description="Pages d'un PDF : « 1-3,5 ».")
     year: int | None = Field(default=None, ge=1900, le=2200, description="Année des dates sans année (relevé).")
+    ocr: Literal["auto", "always", "never"] = Field(
+        default="auto",
+        description="Reconnaissance de texte (OCR) d'un PDF : auto = seulement s'il n'a pas de texte (scanné).",
+    )
 
     @field_validator("delimiter")
     @classmethod
@@ -89,6 +93,9 @@ class SourceInfo(BaseModel):
     encoding: str | None = None
     delimiter: str | None = None
     sheets: list[str] = Field(default_factory=list)
+    ocr: bool = Field(default=False, description="Texte obtenu par reconnaissance de caractères (OCR).")
+    ocr_confidence: float | None = Field(default=None, description="Confiance moyenne de l'OCR (0 à 100).")
+    ocr_languages: str | None = None
 
 
 class TabSend(BaseModel):

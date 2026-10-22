@@ -7,6 +7,7 @@ import type {
   ConversionSummary,
   ConversionView,
   ExportFormat,
+  OcrStatus,
   ParseOptions,
   SampleInfo,
   SendToTabResult,
@@ -115,6 +116,8 @@ export const api = {
   },
 
   tab: () => request<TabStatus>("/tab"),
+  /** Reconnaissance de texte (Tesseract) : `refresh` revérifie tout de suite. */
+  ocr: (refresh = false) => request<OcrStatus>(`/ocr${refresh ? "?refresh=true" : ""}`),
 
   samples: {
     list: () => request<SampleInfo[]>("/samples"),

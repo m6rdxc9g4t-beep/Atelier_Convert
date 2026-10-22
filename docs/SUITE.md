@@ -243,7 +243,8 @@ Les clés sont en `snake_case` sans accent (`heures_estimees`), les libellés en
 Adresse **locale uniquement**, quel que soit le mode : `127.0.0.1`, `localhost` ou `::1` (après résolution).
 
 ### 4.4 Convert → Tab : nouvelle table dans un projet
-**Convert** lit un fichier (relevé bancaire PDF, CSV, TXT, XLSX/XLS, OFX/QFX, QIF, JSON) et en fait une table typée.
+**Convert** lit un fichier (relevé bancaire PDF — y compris scanné ou photographié, par OCR Tesseract sur la machine —,
+CSV, TXT, XLSX/XLS, OFX/QFX, QIF, JSON) et en fait une table typée.
 « Envoyer dans Atelier Tab » écrit **une nouvelle table** dans le dossier de données de Tab (défaut `~/Atelier_Tab`,
 `ATELIER_TAB_DATA_DIR` côté Convert) : un seul fichier `tables/<tbl_id>.json` au format `atelier_tab` v1
 (`src/storage/format.ts` de Tab), `projectId` = projet choisi parmi ceux de `atelier.json`.

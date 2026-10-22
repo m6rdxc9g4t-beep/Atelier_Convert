@@ -58,6 +58,7 @@ export const TYPE_LABELS: Record<ColumnType, string> = {
 
 export const KIND_LABELS: Record<string, string> = {
   pdf: "PDF",
+  image: "Image",
   csv: "CSV",
   txt: "TXT",
   xlsx: "Excel",

@@ -3,7 +3,7 @@
 import type { ProviderChoice, ProviderName } from "./ai";
 
 export type ColumnType = "text" | "number" | "currency" | "date" | "boolean";
-export type SourceKind = "pdf" | "csv" | "txt" | "xlsx" | "xls" | "ofx" | "qif" | "json";
+export type SourceKind = "pdf" | "image" | "csv" | "txt" | "xlsx" | "xls" | "ofx" | "qif" | "json";
 export type PdfMode = "auto" | "statement" | "tables" | "text";
 export type Profile = "auto" | "statement" | "raw";
 export type Role = "date" | "value_date" | "label" | "debit" | "credit" | "amount" | "balance" | "reference" | "category";
@@ -22,6 +22,8 @@ export interface ParseOptions {
   date_order: "auto" | "dmy" | "mdy" | "ymd";
   pages: string | null;
   year: number | null;
+  /** OCR d'un PDF : auto = seulement s'il n'a pas de texte (scanné). */
+  ocr: "auto" | "always" | "never";
 }
 
 export interface Column {
@@ -54,6 +56,9 @@ export interface SourceInfo {
   encoding: string | null;
   delimiter: string | null;
   sheets: string[];
+  ocr: boolean;
+  ocr_confidence: number | null;
+  ocr_languages: string | null;
 }
 
 export interface TabSend {
@@ -151,4 +156,17 @@ export const DEFAULT_OPTIONS: ParseOptions = {
   date_order: "auto",
   pages: null,
   year: null,
+  ocr: "auto",
 };
+
+/** Miroir de `OcrStatus` (backend/app/services/convert/ocr.py). */
+export interface OcrStatus {
+  available: boolean;
+  enabled: boolean;
+  executable: string | null;
+  version: string | null;
+  languages: string[];
+  requested: string;
+  used: string | null;
+  detail: string | null;
+}

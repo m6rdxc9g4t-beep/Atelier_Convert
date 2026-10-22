@@ -9,6 +9,7 @@ from app.core.config import Settings
 from app.services.ai import AIService, AnthropicProvider, ClaudeCliProvider, OllamaProvider
 from app.services.ai.service import ClaudeProvider
 from app.services.atelier import EventJournal, IdempotencyStore
+from app.services.convert.ocr import OcrEngine
 from app.services.convert.service import ConversionService
 from app.services.convert.tab import TabFolder
 from app.services.preferences import Preferences, PreferencesStore
@@ -82,6 +83,12 @@ def get_tab(request: Request) -> TabFolder:
     return tab
 
 
+def get_ocr(request: Request) -> OcrEngine:
+    """Reconnaissance de texte (Tesseract sur la machine)."""
+    engine: OcrEngine = request.app.state.ocr
+    return engine
+
+
 def get_journal(request: Request) -> EventJournal:
     """Journal d'événements du nœud Atelier."""
     journal: EventJournal = request.app.state.journal
@@ -99,5 +106,6 @@ AIServiceDep = Annotated[AIService, Depends(get_ai_service)]
 PreferencesDep = Annotated[PreferencesStore, Depends(get_preferences)]
 ConversionsDep = Annotated[ConversionService, Depends(get_conversions)]
 TabDep = Annotated[TabFolder, Depends(get_tab)]
+OcrDep = Annotated[OcrEngine, Depends(get_ocr)]
 JournalDep = Annotated[EventJournal, Depends(get_journal)]
 IdempotencyDep = Annotated[IdempotencyStore, Depends(get_idempotency)]

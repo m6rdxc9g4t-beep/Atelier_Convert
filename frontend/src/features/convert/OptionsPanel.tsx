@@ -31,7 +31,7 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
   const dirty = JSON.stringify(opts) !== JSON.stringify(conversion.options);
   const isText = kind === "csv" || kind === "txt";
   const isSheet = kind === "xlsx" || kind === "xls";
-  const tabular = isText || isSheet || kind === "pdf" || kind === "json";
+  const tabular = isText || isSheet || kind === "pdf" || kind === "image" || kind === "json";
 
   return (
     <Panel title="Lecture du fichier" icon={SlidersHorizontal} defaultOpen={false}>
@@ -69,7 +69,25 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
               </Field>
             </div>
             <p className="text-[11px] text-muted">Pages : « 1-3,5 ». Année : pour les dates écrites sans année (« 15/03 ») si la période n'est pas reconnue.</p>
+            <Field label="Reconnaissance de texte (OCR)" hint="Auto : seulement pour un PDF scanné (sans texte). Toujours : relit les pages comme des images.">
+              <Segmented
+                label="Reconnaissance de texte (OCR)"
+                value={opts.ocr}
+                onChange={(v) => set({ ocr: v })}
+                options={[
+                  { value: "auto", label: "Auto" },
+                  { value: "always", label: "Toujours" },
+                  { value: "never", label: "Jamais" },
+                ]}
+              />
+            </Field>
           </>
+        )}
+
+        {kind === "image" && (
+          <p className="text-[11px] text-muted">
+            Image lue par OCR (Tesseract, sur la machine). Pour un meilleur résultat : document à plat, bien éclairé, photographié de face.
+          </p>
         )}
 
         {isText && (
