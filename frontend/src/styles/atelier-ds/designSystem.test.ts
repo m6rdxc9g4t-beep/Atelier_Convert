@@ -12,9 +12,23 @@ const colors = read("./colors.css");
 const dark = read("./dark.css");
 const light = read("./light.css");
 const brand = read("../atelier-brand/atelier-brand.css");
+const themeJs = read("../atelier-brand/atelier-theme.js");
 const indexHtml = read("../../../index.html");
-/** Source de la marque commune (dépôt voisin `atelier_projets`), comparée quand elle est présente. */
-const BRAND_REFERENCE = resolve(dirname(fileURLToPath(import.meta.url)), "../../../../../atelier_projets/design-system/brand/atelier-brand.css");
+const viteConfig = read("../../../vite.config.ts");
+const here = dirname(fileURLToPath(import.meta.url));
+/** Source du design system (dépôt voisin `atelier_projets`), comparée quand elle est présente. */
+const SOURCE = resolve(here, "../../../../../atelier_projets/design-system");
+/** Copies verbatim : fichier de la source → copie dans Convert. */
+const COPIES: [string, string][] = [
+  ["brand/atelier-brand.css", "../atelier-brand/atelier-brand.css"],
+  ["brand/atelier-theme.js", "../atelier-brand/atelier-theme.js"],
+  ["brand/inter-latin-wght-normal.woff2", "../atelier-brand/inter-latin-wght-normal.woff2"],
+  ["brand/inter-latin-ext-wght-normal.woff2", "../atelier-brand/inter-latin-ext-wght-normal.woff2"],
+  ["brand/LICENSE-Inter.txt", "../atelier-brand/LICENSE-Inter.txt"],
+  ["themes/light.css", "./light.css"],
+  ["themes/dark.css", "./dark.css"],
+  ["tokens/colors.css", "./colors.css"],
+];
 
 /** Variables déclarées dans une feuille (`--nom:`). */
 const declared = (css: string) => new Set([...css.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
@@ -80,34 +94,57 @@ describe("design system de la Suite Atelier (copies verbatim, docs/SUITE.md §1.
       ["--accent-soft", "var(--atelier-signature-soft)"],
     ];
     for (const [token, value] of map) expect(indexCss).toContain(`${token}: ${value};`);
-    expect(indexCss).toContain("background: var(--atelier-backdrop), var(--bg);");
-    expect(indexCss).not.toMatch(/background-image:\s*var\(--atelier-backdrop\)/);
+    // Données (montants, contrôles) : couleurs inchangées ; états anormaux de l'interface : jetons de la suite.
     expect(indexCss).toMatch(/--positive: color-mix\(in oklab, var\(--status-closed\)/);
     expect(indexCss).toMatch(/--negative: color-mix\(in oklab, var\(--status-rejected\)/);
-    // Aucune police téléchargée.
+    expect(indexCss).toContain("--warning: var(--atelier-warn);");
+    expect(indexCss).toContain("--danger: var(--atelier-down);");
+    // Inter embarquée par la marque (--atelier-font) ; aucune police déclarée ni téléchargée ici.
+    expect(indexCss).toContain("--font-sans: var(--atelier-font);");
     expect(indexCss).not.toMatch(/@font-face|fonts\.googleapis|Inter Variable/);
   });
 
-  it("charte néon monochrome : Atelier Convert est tout en or bronze, sans bleu nuit ni cyan (§1.7)", () => {
+  it("charte v2 « Linear » : plat au repos, sans grille, lueur, halo ni texte lumineux (§1.7)", () => {
+    expect(indexCss).not.toMatch(/--atelier-backdrop|--atelier-text-glow|--atelier-signature-glow|text-shadow|radial-gradient|filter:\s*brightness/);
+    expect(indexCss).toMatch(/body \{\s*background: var\(--bg\);/);
+    // Rayons 5 / 7 / 10 px.
+    for (const [token, value] of [["--radius-sm", "5px"], ["--radius-md", "7px"], ["--radius-lg", "10px"]]) expect(indexCss).toContain(`${token}: ${value};`);
+  });
+
+  it("signature d'Atelier Convert : ocre #9d6d1c, déclarée par la marque commune (§1.7)", () => {
     expect(indexHtml).toMatch(/<html[^>]*data-atelier-app="convert"/);
-    expect(indexCss).toMatch(/--atelier-sig-convert: #c9951d;/i);
-    // Plus spécifique que le `:root` neutre de la marque, chargée après index.css.
-    expect(indexCss).toMatch(/:root\[data-atelier-app="convert"\],\s*\[data-atelier-app="convert"\] \{\s*--atelier-signature: var\(--atelier-sig-convert\);/);
-    expect(brand).not.toContain('data-atelier-app="convert"'); // la copie de la marque reste verbatim
+    expect(brand).toMatch(/--atelier-sig-convert: #9d6d1c;/i);
+    expect(brand).toContain('[data-atelier-app="convert"] { --atelier-signature: var(--atelier-sig-convert); }');
+    // Plus de surcharge locale de la signature ni de son contraste (texte blanc, comme toute la suite).
+    expect(indexCss).not.toMatch(/--atelier-sig-convert|--atelier-signature-contrast:/);
     // Jetons de la v1 (base cyan, bleu nuit) : plus aucun usage dans l'habillage.
     expect(indexCss).not.toMatch(/--atelier-(neon|night|glass|edge|signature-light)\b/);
-    expect(indexCss).not.toMatch(/#06111f|#0a1b2e|#10283f|#17405c|#3fd8ff/i);
+    expect(indexCss).not.toMatch(/#06111f|#0a1b2e|#10283f|#17405c|#3fd8ff|#c9951d/i);
   });
 
   it("la marque commune définit la signature de chaque app du sélecteur de la suite (§1.7, §3)", () => {
-    const signatures = { viz: "#f2c811", tab: "#21a366", projets: "#94d82d", cuisine: "#e056e2" };
+    const signatures = { viz: "#996c00", tab: "#1c8742", convert: "#9d6d1c", projets: "#568100", cuisine: "#8568a7" };
     for (const [app, hex] of Object.entries(signatures)) {
       expect(brand).toMatch(new RegExp(`--atelier-sig-${app}: ${hex};`, "i"));
       expect(brand).toContain(`[data-atelier-app="${app}"] { --atelier-signature: var(--atelier-sig-${app});`);
     }
   });
 
-  it.skipIf(!existsSync(BRAND_REFERENCE))("atelier-brand.css est une copie à l'octet près de celle d'Atelier Projets", () => {
-    expect(brand).toBe(readFileSync(BRAND_REFERENCE, "utf8"));
+  it("marque v2 : police Inter embarquée (plus de Nunito), préférence de thème commune posée avant l'affichage (§1.3, §1.5)", () => {
+    expect(existsSync(resolve(here, "../atelier-brand/inter-latin-wght-normal.woff2"))).toBe(true);
+    expect(existsSync(resolve(here, "../atelier-brand/inter-latin-ext-wght-normal.woff2"))).toBe(true);
+    expect(existsSync(resolve(here, "../atelier-brand/nunito-latin-wght-normal.woff2"))).toBe(false);
+    expect(brand).toContain('font-family: "Atelier Inter";');
+    expect(themeJs).toContain("window.atelierTheme = {");
+    // vite.config.ts insère la copie verbatim en tête de <head> ; plus d'ancien script de thème dans index.html.
+    expect(viteConfig).toMatch(/atelier-brand\/atelier-theme\.js/);
+    expect(viteConfig).toContain('injectTo: "head-prepend"');
+    expect(indexHtml).not.toMatch(/localStorage|<script>/);
+  });
+
+  it.skipIf(!existsSync(SOURCE))("chaque copie est identique à l'octet près à celle d'Atelier Projets", () => {
+    for (const [source, copy] of COPIES) {
+      expect(readFileSync(resolve(here, copy)).equals(readFileSync(resolve(SOURCE, source))), copy).toBe(true);
+    }
   });
 });

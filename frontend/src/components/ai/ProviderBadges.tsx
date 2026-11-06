@@ -12,12 +12,12 @@ interface ProviderBadgesProps {
   onRefresh: () => void;
 }
 
-/** Pastilles d'état des fournisseurs IA (vert = prêt, gris = indisponible, détail au survol). */
+/** État des fournisseurs IA (pastille pleine = prêt, cercle vide = indisponible, détail au survol). */
 export function ProviderBadges({ providers, loading, error, onRefresh }: ProviderBadgesProps) {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {error ? (
-        <span className="text-xs text-negative" title={error}>
+        <span className="px-1 text-xs font-medium text-danger" title={error}>
           API hors ligne
         </span>
       ) : (
@@ -25,12 +25,9 @@ export function ProviderBadges({ providers, loading, error, onRefresh }: Provide
           <span
             key={p.name}
             title={p.detail ?? `${LABELS[p.name]} prêt — ${p.model}`}
-            className="flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1 text-xs"
+            className={clsx("flex h-[26px] items-center gap-1.5 px-1.5 text-xs font-medium", p.available ? "text-fg-2" : "text-muted")}
           >
-            <span
-              aria-hidden
-              className={clsx("size-1.5 rounded-full", p.available ? "bg-positive" : "bg-muted/50")}
-            />
+            <span aria-hidden className={clsx("size-2 rounded-full", p.available ? "bg-up" : "ring-[1.5px] ring-faint ring-inset")} />
             {LABELS[p.name]}
             <span className="sr-only">{p.available ? "disponible" : "indisponible"}</span>
           </span>
@@ -40,7 +37,8 @@ export function ProviderBadges({ providers, loading, error, onRefresh }: Provide
         type="button"
         onClick={onRefresh}
         aria-label="Revérifier les fournisseurs IA"
-        className="rounded-md p-1.5 text-muted hover:bg-surface-2 hover:text-fg"
+        title="Revérifier les fournisseurs IA"
+        className="at-btn at-btn--ghost at-btn--sm at-btn--icon"
       >
         <RefreshCw className={clsx("size-3.5", loading && "animate-spin")} aria-hidden />
       </button>

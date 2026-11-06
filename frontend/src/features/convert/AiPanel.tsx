@@ -42,7 +42,7 @@ export function AiPanel({ conversion, info, onDone }: { conversion: ConversionVi
       <p className="mb-3 text-xs text-muted">Quand la lecture automatique ne trouve pas de table, l'IA peut en proposer une à partir du texte du document.</p>
       <EnginePicker engine={engine} note={note} />
       {toClaude && (
-        <p className="mt-2 flex items-start gap-1.5 text-[11px] text-warning">
+        <p className="mt-2 flex items-start gap-1.5 text-xs font-medium text-warning">
           <TriangleAlert className="mt-px size-3 shrink-0" aria-hidden />
           Avec Claude, ce texte quitte la machine (abonnement Claude Code). Pour un relevé bancaire, préférez Ollama (local).
         </p>
@@ -61,11 +61,11 @@ export function AiPanel({ conversion, info, onDone }: { conversion: ConversionVi
         {note}
       </p>
       <div className="mt-2 flex gap-2">
-        <button type="button" disabled={busy || engine.down} onClick={() => void run()} className="atelier-btn-primary flex-1 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-40">
+        <button type="button" disabled={busy || engine.down} onClick={() => void run()} className="at-btn flex-1">
           {busy ? "L'IA structure le texte…" : "Structurer avec l'IA"}
         </button>
         {busy && (
-          <button type="button" onClick={() => abort.current?.abort()} className="rounded-md border border-border px-2.5 text-xs hover:bg-surface-2">
+          <button type="button" onClick={() => abort.current?.abort()} className="at-btn">
             Annuler
           </button>
         )}

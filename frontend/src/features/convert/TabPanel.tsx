@@ -62,8 +62,8 @@ export function TabPanel({ conversion, onSent }: { conversion: ConversionView; o
       ) : !status.found || !status.projects.length ? (
         <div className="space-y-2 text-xs">
           <p className="text-muted">{status.detail}</p>
-          {status.directory && <p className="truncate font-mono text-[11px] text-muted" title={status.directory}>{status.directory}</p>}
-          <button type="button" onClick={load} className="flex items-center gap-1.5 rounded-md border border-border px-2 py-1 hover:bg-surface-2">
+          {status.directory && <p className="truncate font-mono text-xs text-muted" title={status.directory}>{status.directory}</p>}
+          <button type="button" onClick={load} className="at-btn at-btn--sm">
             <RefreshCw className="size-3" aria-hidden /> Revérifier
           </button>
         </div>
@@ -89,19 +89,19 @@ export function TabPanel({ conversion, onSent }: { conversion: ConversionView; o
             type="button"
             disabled={busy || !project || !included}
             onClick={() => void send()}
-            className="atelier-btn-primary flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium disabled:opacity-40"
+            className="at-btn atelier-btn-primary w-full"
           >
             <Send className="size-3.5" aria-hidden />
             {busy ? "Envoi…" : `Envoyer ${conversion.rows} ligne(s)`}
           </button>
-          <p className="text-[11px] text-muted">
+          <p className="text-xs text-muted">
             {included} colonne(s) incluse(s), typées (dates, montants en €). Le libellé devient le titre des lignes. Tab, s'il est ouvert, affiche la table tout de suite.
           </p>
         </div>
       )}
       {conversion.sent.length > 0 && (
         <div className="mt-3 border-t border-line pt-3">
-          <p className="text-[11px] font-medium text-muted">Déjà envoyée</p>
+          <p className="text-xs font-medium text-fg-2">Déjà envoyée</p>
           <ul className="mt-1 space-y-1 text-xs">
             {conversion.sent
               .slice()
@@ -112,7 +112,7 @@ export function TabPanel({ conversion, onSent }: { conversion: ConversionView; o
                 </li>
               ))}
           </ul>
-          <button type="button" onClick={() => openExternal(tabUrl)} className="mt-2 flex items-center gap-1.5 text-xs text-accent-ink hover:underline">
+          <button type="button" onClick={() => openExternal(tabUrl)} className="mt-2 flex items-center gap-1.5 rounded-sm text-xs font-medium text-accent-ink hover:underline">
             <ExternalLink className="size-3" aria-hidden /> Ouvrir Atelier Tab
           </button>
         </div>

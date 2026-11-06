@@ -42,10 +42,10 @@ export function Toaster() {
   return (
     <div className="pointer-events-none fixed right-4 bottom-4 z-50 flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2" aria-live="polite">
       {items.map((t) => (
-        <div key={t.id} role={t.kind === "error" ? "alert" : "status"} className="atelier-pop pointer-events-auto flex items-start gap-2.5 rounded-lg border bg-surface p-3 text-sm">
-          {t.kind === "ok" ? <CircleCheck className="mt-0.5 size-4 shrink-0 text-positive" aria-hidden /> : <CircleAlert className="mt-0.5 size-4 shrink-0 text-negative" aria-hidden />}
-          <p className={clsx("min-w-0 flex-1 break-words", t.kind === "error" && "text-negative")}>{t.text}</p>
-          <button type="button" onClick={() => dismiss(t.id)} aria-label="Fermer" className="rounded p-0.5 text-muted hover:text-fg">
+        <div key={t.id} role={t.kind === "error" ? "alert" : "status"} className="atelier-pop pointer-events-auto flex items-start gap-2.5 rounded-lg border bg-surface px-3 py-2.5 text-sm">
+          {t.kind === "ok" ? <CircleCheck className="mt-px size-4 shrink-0 text-up" aria-hidden /> : <CircleAlert className="mt-px size-4 shrink-0 text-danger" aria-hidden />}
+          <p className={clsx("min-w-0 flex-1 break-words", t.kind === "error" && "text-danger")}>{t.text}</p>
+          <button type="button" onClick={() => dismiss(t.id)} aria-label="Fermer" className="-m-0.5 grid size-5 shrink-0 place-items-center rounded-sm text-muted hover:bg-surface-2 hover:text-fg">
             <X className="size-3.5" aria-hidden />
           </button>
         </div>

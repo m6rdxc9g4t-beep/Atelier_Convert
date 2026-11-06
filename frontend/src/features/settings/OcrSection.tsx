@@ -29,10 +29,10 @@ export function OcrSection() {
   const french = status?.used?.split("+").includes("fra") ?? false;
 
   return (
-    <section className="atelier-card rounded-xl border border-border bg-surface p-5">
+    <section className="atelier-card p-5">
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold">Reconnaissance de texte (OCR)</h2>
-        <button type="button" onClick={() => load(true)} aria-label="Revérifier l'OCR" className="rounded p-1.5 text-muted hover:bg-surface-2 hover:text-fg">
+        <button type="button" onClick={() => load(true)} aria-label="Revérifier l'OCR" className="at-btn at-btn--ghost at-btn--icon">
           <RefreshCw className={clsx("size-4", loading && "animate-spin")} aria-hidden />
         </button>
       </div>
@@ -42,13 +42,13 @@ export function OcrSection() {
       </p>
       {status && (
         <div className="mt-3 flex items-start gap-3 text-sm">
-          <span className={clsx("mt-1.5 size-2 shrink-0 rounded-full", status.available ? (french ? "bg-positive" : "bg-warning") : "bg-muted/50")} aria-hidden />
+          <span className={clsx("mt-1.5 size-2 shrink-0 rounded-full", status.available ? (french ? "bg-up" : "bg-warning") : "ring-[1.5px] ring-faint ring-inset")} aria-hidden />
           <span className="min-w-0">
             <span className="block font-medium">
               {status.available ? `Tesseract ${status.version ?? ""} — langues : ${status.used}` : status.enabled ? "OCR indisponible" : "OCR désactivé"}
             </span>
             {status.executable && (
-              <span className="block truncate font-mono text-[11px] text-muted" title={status.executable}>
+              <span className="block truncate font-mono text-xs text-muted" title={status.executable}>
                 {status.executable}
               </span>
             )}
@@ -57,7 +57,7 @@ export function OcrSection() {
         </div>
       )}
       {status && (!status.available || !french) && status.enabled && (
-        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 rounded-lg border border-border bg-surface-2 p-3 text-xs">
+        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 rounded-md border border-line bg-sidebar p-3 text-xs">
           {INSTALL.map((i) => (
             <div key={i.os} className="contents">
               <dt className="text-muted">{i.os}</dt>
@@ -66,7 +66,7 @@ export function OcrSection() {
           ))}
         </dl>
       )}
-      <p className="mt-3 text-[11px] text-muted">
+      <p className="mt-3 text-xs text-muted">
         Réglages (backend/.env) : CONVERT_OCR_TESSERACT (chemin de l'exécutable), CONVERT_OCR_LANGUAGES (« fra+eng »), CONVERT_OCR_TESSDATA (dossier des langues), CONVERT_OCR_ENABLED.
       </p>
     </section>
