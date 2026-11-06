@@ -545,18 +545,18 @@ def run_update(
 
 _SPLASH = """<!doctype html><html lang="fr"><meta charset="utf-8"><title>__APP__</title>
 <style>
-:root{--bg:#fafaf7;--fg:#1f2328;--muted:#656d76;--line:#e4e2da;--accent:#c9951d;--ink:#7a5a12;--danger:#b42318}
-@media (prefers-color-scheme:dark){:root{--bg:#121212;--fg:#ececec;--muted:#a0a0a0;--line:#2c2c2c;--ink:#c9951d;
---danger:#ff8a80}}
-body{font:15px -apple-system,system-ui,sans-serif;background:var(--bg);color:var(--fg);margin:0;height:100vh;
-display:grid;place-items:center}
-main{max-width:34rem;padding:2rem}h1{font-size:18px;margin:0 0 .75rem}p{line-height:1.5;margin:.5rem 0}
+:root{--bg:#fbfbfc;--fg:#1a1b1e;--muted:#5f636c;--line:#d0d2d8;--accent:#9d6d1c;--danger:#c9302b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1012;--fg:#e8e9ec;--muted:#969aa3;--line:#33353c;--danger:#ff6b6b;
+color-scheme:dark}}
+body{font:14px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);margin:0;
+height:100vh;display:grid;place-items:center;-webkit-font-smoothing:antialiased}
+main{max-width:34rem;padding:2rem}h1{font-size:17px;font-weight:600;margin:0 0 .75rem}p{margin:.5rem 0}
 .muted{color:var(--muted);font-size:13px}.err{color:var(--danger)}
-.spin{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;
+.spin{width:20px;height:20px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;
 animation:r 1s linear infinite;margin-bottom:1rem}@keyframes r{to{transform:rotate(360deg)}}
-button{font:inherit;padding:.5rem .9rem;border-radius:8px;border:1px solid var(--line);background:transparent;
-color:var(--fg);cursor:pointer;margin:.75rem .5rem 0 0}
-button.primary{background:var(--accent);border-color:var(--accent);color:#1f2328}
+button{font-family:inherit;font-size:13px;font-weight:500;height:30px;padding:0 12px;border-radius:7px;
+border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;margin:.75rem .5rem 0 0}
+button.primary{background:var(--accent);border-color:transparent;color:#fff}
 [hidden]{display:none!important}
 </style>
 <main>

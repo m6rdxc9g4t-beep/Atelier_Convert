@@ -1,11 +1,9 @@
 import { useId, useRef } from "react";
-import { ArrowRightLeft } from "lucide-react";
-
-import logo from "../../assets/logo-atelier-convert.webp";
+import { ArrowLeftRight, X } from "lucide-react";
 
 /**
- * Marque commune de la Suite Atelier (styles/atelier-brand, docs/SUITE.md §1.6) :
- * tuile + « atelier_Convert » ; un clic ouvre la fenêtre « À propos » avec le logo en grand.
+ * Marque commune de la Suite Atelier (styles/atelier-brand, docs/SUITE.md §1.6) : icône carrée en dégradé de la
+ * signature (glyphe Lucide `arrow-left-right`) + « Atelier Convert » ; un clic ouvre la fenêtre « À propos ».
  */
 export function AtelierBrand({ showName = true, nameClassName = "" }: { showName?: boolean; nameClassName?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -22,11 +20,11 @@ export function AtelierBrand({ showName = true, nameClassName = "" }: { showName
         onClick={() => dialog.current?.showModal()}
       >
         <span className="atelier-brand__tile" aria-hidden="true">
-          <ArrowRightLeft />
+          <ArrowLeftRight />
         </span>
         {showName && (
           <span className={`atelier-brand__name ${nameClassName}`}>
-            <span className="atelier-brand__prefix">atelier_</span>Convert
+            <span className="atelier-brand__prefix">Atelier </span>Convert
           </span>
         )}
       </button>
@@ -41,11 +39,13 @@ export function AtelierBrand({ showName = true, nameClassName = "" }: { showName
       >
         <div className="atelier-about__panel">
           <button type="button" className="atelier-about__close" aria-label="Fermer" onClick={() => dialog.current?.close()}>
-            ×
+            <X className="size-4" aria-hidden />
           </button>
-          <img className="atelier-about__logo" src={logo} alt="Logo Atelier Convert" width={576} height={576} />
+          <span className="atelier-about__icon atelier-brand__tile" aria-hidden="true">
+            <ArrowLeftRight />
+          </span>
           <h2 id={titleId} className="atelier-about__name">
-            <span className="atelier-brand__prefix">atelier_</span>Convert
+            <span className="atelier-brand__prefix">Atelier </span>Convert
           </h2>
           <p className="atelier-about__tagline">Relevés bancaires en PDF, exports CSV, TXT, Excel, OFX ou QIF convertis en tables propres pour Atelier Tab, sans que rien ne quitte la machine.</p>
           <p className="atelier-about__suite">Suite Atelier · 100 % local</p>

@@ -182,7 +182,7 @@ export function PreviewTable({ columns, rows, total, busy, edited = {}, onColumn
       aria-label="Aperçu de la table"
       onFocus={() => setWithin(true)}
       onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setWithin(false)}
-      className="atelier-card flex min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-surface">
+      className="atelier-card flex min-h-0 flex-col overflow-hidden">
       <div className="min-h-0 flex-1 overflow-auto">
         <table ref={tableRef} className="convert-table table-fixed border-collapse text-sm" style={{ width: `max(100%, ${minWidth}px)` }}>
           <colgroup>
@@ -193,7 +193,7 @@ export function PreviewTable({ columns, rows, total, busy, edited = {}, onColumn
           </colgroup>
           <thead>
             <tr>
-              <th scope="col" className="border-b border-line px-2 py-2 text-right text-[11px] font-normal text-muted">
+              <th scope="col" className="border-b border-line px-2 py-2 text-right text-[11.5px] font-medium text-faint">
                 #
               </th>
               {columns.map((col, i) => (
@@ -215,8 +215,8 @@ export function PreviewTable({ columns, rows, total, busy, edited = {}, onColumn
               const rowSwap = editable ? swapEdits(row, r, columns) : null;
               const toCredit = typeof rowSwap?.[1]?.value === "number";
               return (
-                <tr key={r} className="group hover:bg-accent-faint">
-                  <td className="relative border-b border-line px-2 py-1.5 text-right text-[11px] text-muted tabular-nums">
+                <tr key={r} className="group hover:bg-surface-2">
+                  <td className="relative border-b border-line px-2 py-1.5 text-right text-[11.5px] text-faint tabular-nums">
                     <span className={clsx(rowSwap && "group-hover:invisible")}>{r + 1}</span>
                     {rowSwap && (
                       <button
@@ -226,7 +226,7 @@ export function PreviewTable({ columns, rows, total, busy, edited = {}, onColumn
                         onClick={() => void swap(rowSwap, { r, c: focus.c })}
                         title={toCredit ? "Passer en crédit (entrée d'argent)" : "Passer en débit (sortie d'argent)"}
                         aria-label={`Ligne ${r + 1} : ${toCredit ? "passer en crédit" : "passer en débit"}`}
-                        className="absolute inset-0 m-auto hidden size-6 items-center justify-center rounded text-accent-ink group-hover:flex hover:bg-accent-soft"
+                        className="absolute inset-0 m-auto hidden size-6 items-center justify-center rounded-sm text-muted group-hover:flex hover:bg-surface-3 hover:text-fg"
                       >
                         <ArrowLeftRight className="size-3.5" aria-hidden />
                       </button>
@@ -298,11 +298,11 @@ export function PreviewTable({ columns, rows, total, busy, edited = {}, onColumn
           </tbody>
         </table>
       </div>
-      <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-3 py-2 text-xs text-muted">
+      <footer className="flex min-h-10 flex-wrap items-center justify-between gap-2 border-t border-line px-3 py-1.5 text-xs text-muted tabular-nums">
         <span>
           {rows.length.toLocaleString("fr-FR")} ligne(s) affichée(s) sur {total.toLocaleString("fr-FR")} · {columns.filter((c) => c.include).length} colonne(s) incluse(s)
-          {corrections > 0 && <span className="text-accent-ink"> · {corrections} cellule(s) corrigée(s)</span>}
-          {problems > 0 && <span className="text-warning"> · {problems} valeur(s) non converties (surlignées)</span>}
+          {corrections > 0 && <span className="text-fg-2"> · {corrections} cellule(s) corrigée(s)</span>}
+          {problems > 0 && <span className="font-medium text-warning"> · {problems} valeur(s) non converties (surlignées)</span>}
           {onCells && rows.length > 0 && <span className="hidden lg:inline"> · double-clic ou Entrée pour corriger une cellule</span>}
         </span>
         <span className="flex items-center gap-2">
@@ -311,14 +311,14 @@ export function PreviewTable({ columns, rows, total, busy, edited = {}, onColumn
               type="button"
               disabled={saving}
               onClick={() => void swap(focusedSwap, focus)}
-              className="flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-surface-2 hover:text-fg disabled:opacity-50"
+              className="at-btn at-btn--sm"
             >
               <ArrowLeftRight className="size-3" aria-hidden />
               Ligne {focus.r + 1} : {typeof focusedSwap[1]?.value === "number" ? "passer en crédit" : "passer en débit"}
             </button>
           )}
           {onMore && (
-            <button type="button" onClick={onMore} className="rounded-md border border-border px-2 py-1 hover:bg-surface-2 hover:text-fg">
+            <button type="button" onClick={onMore} className="at-btn at-btn--sm">
               Afficher plus de lignes
             </button>
           )}
@@ -371,7 +371,7 @@ function HeaderCell({
             if (e.key === "Escape") setLabel(column.label);
           }}
           aria-label={`Nom de la colonne ${column.label}`}
-          className="min-w-0 flex-1 rounded border border-transparent bg-transparent px-1 py-0.5 font-semibold text-fg hover:border-border"
+          className="h-6 min-w-0 flex-1 rounded-sm border border-transparent bg-transparent px-1 font-semibold text-fg hover:border-border"
         />
       </div>
       <div className="flex items-center gap-0.5">
@@ -381,7 +381,7 @@ function HeaderCell({
           onChange={(e) => onChange({ type: e.target.value as ColumnType })}
           aria-label={`Type de la colonne ${column.label}`}
           title={TYPE_LABELS[column.type]}
-          className="min-w-0 flex-1 rounded border border-border bg-field px-1 py-0.5 text-[11px] text-muted"
+          className="at-input at-input--sm min-w-0 flex-1 text-muted"
         >
           {TYPES.map((t) => (
             <option key={t} value={t} title={TYPE_LABELS[t]}>
@@ -389,10 +389,10 @@ function HeaderCell({
             </option>
           ))}
         </select>
-        <button type="button" disabled={disabled || first} onClick={() => onMove(-1)} aria-label={`Déplacer ${column.label} à gauche`} className="rounded text-muted hover:text-fg disabled:opacity-30">
+        <button type="button" disabled={disabled || first} onClick={() => onMove(-1)} aria-label={`Déplacer ${column.label} à gauche`} className="grid size-6 shrink-0 place-items-center rounded-sm text-muted hover:bg-surface-3 hover:text-fg disabled:pointer-events-none disabled:opacity-30">
           <ChevronLeft className="size-3.5" aria-hidden />
         </button>
-        <button type="button" disabled={disabled || last} onClick={() => onMove(1)} aria-label={`Déplacer ${column.label} à droite`} className="rounded text-muted hover:text-fg disabled:opacity-30">
+        <button type="button" disabled={disabled || last} onClick={() => onMove(1)} aria-label={`Déplacer ${column.label} à droite`} className="grid size-6 shrink-0 place-items-center rounded-sm text-muted hover:bg-surface-3 hover:text-fg disabled:pointer-events-none disabled:opacity-30">
           <ChevronRight className="size-3.5" aria-hidden />
         </button>
       </div>

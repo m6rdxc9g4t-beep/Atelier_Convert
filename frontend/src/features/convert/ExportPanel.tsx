@@ -35,19 +35,19 @@ export function ExportPanel({ conversionId }: { conversionId: string }) {
 
   return (
     <Panel title="Exporter" icon={Download}>
-      <ul className="space-y-1.5">
+      <ul className="-mx-1.5 -my-1">
         {FORMATS.map((f) => (
           <li key={f.value}>
             <button
               type="button"
               disabled={busy !== null}
               onClick={() => void run(f.value)}
-              className="flex w-full items-start gap-2 rounded-md border border-border px-2.5 py-2 text-left hover:border-border-strong hover:bg-accent-faint disabled:opacity-50"
+              className="flex w-full items-start gap-2.5 rounded-md px-1.5 py-1.5 text-left transition-colors hover:bg-surface-2 disabled:opacity-50"
             >
-              <Download className="mt-0.5 size-3.5 shrink-0 text-accent-ink" aria-hidden />
+              <Download className="mt-px size-3.5 shrink-0 text-faint" aria-hidden />
               <span className="min-w-0">
                 <span className="block text-sm font-medium">{busy === f.value ? "Préparation…" : f.label}</span>
-                <span className="block text-[11px] text-muted">{f.detail}</span>
+                <span className="block text-xs text-muted">{f.detail}</span>
               </span>
             </button>
           </li>

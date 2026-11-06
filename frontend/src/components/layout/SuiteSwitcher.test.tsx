@@ -26,13 +26,13 @@ describe("sélecteur « Suite Atelier »", () => {
     await userEvent.click(button);
     expect(button).toHaveAttribute("aria-expanded", "true");
     const items = screen.getAllByRole("menuitemradio");
-    // Affichage dans la marque commune (« atelier_Convert »), noms accessibles inchangés (docs/SUITE.md §3).
+    // Affichage dans la marque commune (« Atelier Convert »), noms accessibles inchangés (docs/SUITE.md §3, §1.6).
     expect(items.map((i) => i.textContent)).toEqual([
-      expect.stringContaining("atelier_Viz"),
-      expect.stringContaining("atelier_Tab"),
-      expect.stringContaining("atelier_Convert"),
-      expect.stringContaining("atelier_Projets"),
-      expect.stringContaining("atelier_Cuisine"),
+      expect.stringContaining("Atelier Viz"),
+      expect.stringContaining("Atelier Tab"),
+      expect.stringContaining("Atelier Convert"),
+      expect.stringContaining("Atelier Projets"),
+      expect.stringContaining("Atelier Cuisine"),
     ]);
     expect(items.map((i) => i.getAttribute("aria-label"))).toEqual([
       expect.stringContaining("Atelier Viz"),
@@ -43,8 +43,15 @@ describe("sélecteur « Suite Atelier »", () => {
     ]);
     expect(items[2]).toHaveAttribute("aria-checked", "true");
     expect(items[2]).toHaveFocus();
-    // Chaque tuile porte la couleur signature de SON application (docs/SUITE.md §1.7).
+    // Chaque icône porte la couleur signature de SON application (docs/SUITE.md §1.7) et son glyphe Lucide (§1.6).
     expect(items.map((i) => i.querySelector(".atelier-brand__tile")?.getAttribute("data-atelier-app"))).toEqual(["viz", "tab", "convert", "projets", "cuisine"]);
+    expect(items.map((i) => i.querySelector(".atelier-brand__tile svg")?.getAttribute("class"))).toEqual([
+      expect.stringContaining("lucide-chart-column"),
+      expect.stringContaining("lucide-table"),
+      expect.stringContaining("lucide-arrow-left-right"),
+      expect.stringContaining("lucide-kanban"),
+      expect.stringContaining("lucide-utensils"),
+    ]);
     // fetch refusé (no-cors) : Viz, Projets et Tab sont « arrêtée », sans bloquer le menu ; Convert (la page) est en marche.
     expect(await screen.findByRole("menuitemradio", { name: "Atelier Projets (Arrêtée)" })).toBeInTheDocument();
     expect(await screen.findByRole("menuitemradio", { name: "Atelier Tab (Arrêtée)" })).toBeInTheDocument();

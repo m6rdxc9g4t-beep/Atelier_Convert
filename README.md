@@ -1,6 +1,6 @@
 # Atelier Convert
 
-<img src="docs/brand/logo-atelier-convert.png" alt="Logo Atelier Convert" width="220" align="right" />
+<img src="docs/brand/logo-atelier-convert.png" alt="Icône Atelier Convert" width="96" align="right" />
 
 Application **locale** de la Suite Atelier qui transforme vos fichiers en **tables propres pour Atelier Tab** :
 un relevé bancaire en PDF devient Date · Libellé · Débit · Crédit · Montant (· Solde), un export CSV ou TXT de
@@ -12,8 +12,9 @@ qui crée directement la table dans le projet choisi.
 - **Hors ligne par défaut** : la lecture des fichiers, les exports et l'envoi vers Tab se font sur la machine.
 - **IA facultative** (« Structurer avec l'IA ») pour un document que la lecture automatique ne sait pas mettre en
   table : Ollama en local, ou Claude (CLI Claude Code, isolée et sans outils) en mode « En ligne ».
-- Même design que la suite : charte « néon monochrome », couleur signature **or bronze `#C9951D`**,
-  icône `arrow-right-left`, sélecteur « Suite Atelier », clair / sombre / système.
+- Même design que la suite : charte v2 « Linear » (structure neutre gris froid, police Inter embarquée),
+  couleur signature **ocre `#9d6d1c`** pour l'accent, icône `arrow-left-right`, sélecteur « Suite Atelier »,
+  thème système / clair / sombre commun à la suite.
 - Conventions pour Claude : [`CLAUDE.md`](CLAUDE.md) · contrat commun de la suite : [`docs/SUITE.md`](docs/SUITE.md) (§4.4).
 
 ## Démarrage

@@ -27,26 +27,26 @@ export function Dropzone({ busy, onFile, compact = false }: { busy: boolean; onF
       }}
       onDragLeave={() => setOver(false)}
       onDrop={onDrop}
-      className={clsx("convert-drop flex flex-col items-center justify-center rounded-xl text-center", compact ? "gap-2 px-4 py-6" : "gap-4 px-6 py-14")}
+      className={clsx("convert-drop flex flex-col items-center justify-center rounded-lg text-center", compact ? "gap-2 px-4 py-6" : "gap-3.5 px-6 py-12")}
     >
-      <span className={clsx("atelier-brand__tile", !compact && "scale-125")} aria-hidden>
-        {busy ? <LoaderCircle className="animate-spin" /> : <FileUp />}
+      <span className="grid size-10 place-items-center rounded-lg border border-line bg-surface-2 text-muted" aria-hidden>
+        {busy ? <LoaderCircle className="size-5 animate-spin" /> : <FileUp className="size-5" />}
       </span>
       <div>
-        <p className={clsx("font-semibold", compact ? "text-sm" : "text-lg")}>{busy ? "Conversion en cours…" : "Déposez un relevé ou un fichier"}</p>
-        <p id={hintId} className="mt-1 text-xs text-muted">
+        <p className={clsx("font-semibold", compact ? "text-sm" : "text-base")}>{busy ? "Conversion en cours…" : "Déposez un relevé ou un fichier"}</p>
+        <p id={hintId} className="mx-auto mt-1 max-w-lg text-sm text-muted">
           {busy
             ? "Un document scanné est lu par OCR : quelques secondes par page."
             : "Relevé bancaire en PDF (même scanné), photo, export CSV ou TXT, classeur Excel, fichier OFX ou QIF. Rien ne quitte la machine."}
         </p>
       </div>
-      <button type="button" disabled={busy} onClick={() => input.current?.click()} aria-describedby={hintId} className="atelier-btn-primary rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50">
+      <button type="button" disabled={busy} onClick={() => input.current?.click()} aria-describedby={hintId} className="at-btn atelier-btn-primary">
         Choisir un fichier
       </button>
       {!compact && (
-        <ul className="flex flex-wrap justify-center gap-1.5" aria-label="Formats acceptés">
+        <ul className="flex max-w-md flex-wrap justify-center gap-1" aria-label="Formats acceptés">
           {FORMATS.map((f) => (
-            <li key={f} className="rounded-full border border-border px-2 py-0.5 font-mono text-[11px] text-muted">
+            <li key={f} className="at-tag">
               {f}
             </li>
           ))}

@@ -17,23 +17,23 @@ export function StatementCard({ statement }: { statement: StatementSummary }) {
   if (s.closing_balance !== null) items.push(["Solde final", formatMoney(s.closing_balance)]);
 
   return (
-    <section aria-label="Synthèse du relevé" className="atelier-card rounded-xl border border-border bg-surface p-4">
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 xl:grid-cols-7">
+    <section aria-label="Synthèse du relevé" className="atelier-card px-4 py-3">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3 xl:grid-cols-7">
         {items.map(([label, value], i) => (
           <div key={label} className={clsx("min-w-0", i === 0 && "col-span-2 sm:col-span-1 xl:col-span-2")}>
-            <dt className="text-[11px] tracking-wide text-muted uppercase">{label}</dt>
-            <dd className="mt-0.5 truncate text-sm font-semibold tabular-nums">{value}</dd>
+            <dt className="text-xs text-muted">{label}</dt>
+            <dd className="mt-0.5 truncate text-base font-semibold tabular-nums">{value}</dd>
           </div>
         ))}
       </dl>
       <p
         className={clsx(
-          "mt-3 flex items-start gap-1.5 border-t border-line pt-3 text-xs",
-          s.balance_check === "ok" ? "text-positive" : s.balance_check === "mismatch" ? "text-negative" : "text-muted",
+          "mt-3 flex items-start gap-1.5 border-t border-line pt-2.5 text-xs",
+          s.balance_check === "mismatch" ? "font-medium text-danger" : "text-muted",
         )}
       >
         {s.balance_check === "ok" ? (
-          <CircleCheck className="mt-px size-3.5 shrink-0" aria-hidden />
+          <CircleCheck className="mt-px size-3.5 shrink-0 text-up" aria-hidden />
         ) : s.balance_check === "mismatch" ? (
           <TriangleAlert className="mt-px size-3.5 shrink-0" aria-hidden />
         ) : (

@@ -78,7 +78,7 @@ export function EnginePicker({ engine, note }: { engine: Engine; note: string })
   const claudeChoosable = !!engine.claude?.models.length;
   return (
     <>
-      <div className="grid grid-cols-3 gap-1 rounded-md border border-border p-0.5 text-[11px]" role="radiogroup" aria-label="Moteur d'IA">
+      <div className="at-seg grid w-full" role="radiogroup" aria-label="Moteur d'IA">
         {PROVIDERS.map((p) => {
           const disabled = p.value === "anthropic" && !engine.online;
           return (
@@ -90,17 +90,13 @@ export function EnginePicker({ engine, note }: { engine: Engine; note: string })
               disabled={disabled}
               title={disabled ? "Activez le mode « En ligne » pour utiliser Claude" : undefined}
               onClick={() => engine.setChoice(p.value)}
-              className={clsx(
-                "rounded py-1.5 disabled:cursor-not-allowed disabled:opacity-40",
-                engine.provider === p.value ? "bg-surface-2 font-medium text-fg" : "text-muted hover:text-fg",
-              )}
             >
               {p.label}
             </button>
           );
         })}
       </div>
-      <div className="mt-2 flex items-center gap-2 text-[11px] text-muted">
+      <div className="mt-2 flex items-center gap-2 text-xs text-muted">
         <label htmlFor={modelId} className="shrink-0">
           Modèle {claudeSide ? "Claude" : "Ollama"}
         </label>
@@ -110,7 +106,7 @@ export function EnginePicker({ engine, note }: { engine: Engine; note: string })
               id={modelId}
               value={engine.claudeModel}
               onChange={(e) => engine.setClaudeModel(e.target.value as ClaudeModel)}
-              className="min-w-0 flex-1 rounded border border-border bg-field px-1.5 py-0.5 text-xs text-fg"
+              className="at-input at-input--sm min-w-0 flex-1"
             >
               {CLAUDE_MODELS.map((m) => (
                 <option key={m.value} value={m.value}>
@@ -129,7 +125,7 @@ export function EnginePicker({ engine, note }: { engine: Engine; note: string })
             value={ollamaSelected(engine.ollama, engine.ollamaModel)}
             disabled={!ollamaList.length}
             onChange={(e) => engine.setOllamaModel(e.target.value)}
-            className="min-w-0 flex-1 rounded border border-border bg-field px-1.5 py-0.5 text-xs text-fg disabled:opacity-50"
+            className="at-input at-input--sm min-w-0 flex-1"
           >
             {ollamaList.length ? (
               ollamaList.map((m) => (
@@ -143,7 +139,7 @@ export function EnginePicker({ engine, note }: { engine: Engine; note: string })
           </select>
         )}
       </div>
-      <p className={clsx("mt-2 flex items-start gap-1.5 text-[11px]", engine.down ? "text-negative" : "text-muted")}>
+      <p className={clsx("mt-2 flex items-start gap-1.5 text-xs", engine.down ? "font-medium text-danger" : "text-muted")}>
         {engine.down ? <TriangleAlert className="mt-px size-3 shrink-0" aria-hidden /> : <ShieldCheck className="mt-px size-3 shrink-0" aria-hidden />}
         <span>{engine.down ? `${engine.label} n'est pas disponible (voir Réglages).` : `Réponse par ${engine.label}${engine.model ? ` (${engine.model})` : ""}. ${note}`}</span>
       </p>

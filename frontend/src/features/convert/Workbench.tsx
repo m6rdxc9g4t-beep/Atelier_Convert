@@ -1,4 +1,4 @@
-import { ArrowLeft, FileUp, Info, TriangleAlert } from "lucide-react";
+import { ArrowLeft, FileUp, Info, LoaderCircle, TriangleAlert } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { toast } from "../../components/Toaster";
@@ -107,14 +107,21 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
   if (error) {
     return (
       <div className="mx-auto max-w-xl p-8 text-center">
-        <p className="text-sm text-negative">{error}</p>
-        <button type="button" onClick={() => navigate("/")} className="mt-4 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-surface-2">
+        <p role="alert" className="at-alert px-3 py-2.5 text-sm">
+          {error}
+        </p>
+        <button type="button" onClick={() => navigate("/")} className="at-btn mt-4">
           Revenir à l'accueil
         </button>
       </div>
     );
   }
-  if (!conv) return <p className="p-8 text-center text-sm text-muted">Chargement de la conversion…</p>;
+  if (!conv)
+    return (
+      <p className="flex items-center justify-center gap-2 p-8 text-sm text-muted" role="status">
+        <LoaderCircle className="size-4 animate-spin" aria-hidden /> Chargement de la conversion…
+      </p>
+    );
 
   const src = conv.source;
   const facts = [
@@ -127,9 +134,9 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
   ].filter(Boolean);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-4 lg:p-6">
+    <div className="flex h-full min-h-0 flex-col gap-3 p-3 lg:gap-4 lg:px-5 lg:py-4">
       <div className="flex flex-wrap items-start gap-3">
-        <button type="button" onClick={() => navigate("/")} aria-label="Accueil" title="Accueil" className="mt-0.5 rounded-md p-1.5 text-muted hover:bg-surface-2 hover:text-fg">
+        <button type="button" onClick={() => navigate("/")} aria-label="Accueil" title="Accueil" className="at-btn at-btn--ghost at-btn--icon">
           <ArrowLeft className="size-4" aria-hidden />
         </button>
         <div className="min-w-0 flex-1">
@@ -140,11 +147,11 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
             onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
             aria-label="Nom de la conversion"
             maxLength={200}
-            className="atelier-title w-full max-w-xl rounded-md border border-transparent bg-transparent px-1 text-lg font-semibold hover:border-border"
+            className="h-[30px] w-full max-w-xl rounded-md border border-transparent bg-transparent px-1.5 text-lg font-semibold hover:border-border"
           />
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 px-1 text-xs text-muted">
-            <span className="rounded-full bg-accent-soft px-2 py-0.5 font-medium text-accent-ink">{conv.detected}</span>
-            <span className="truncate" title={src.filename}>
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 px-1.5 text-xs text-muted tabular-nums">
+            <span className="flex h-5 items-center rounded-sm bg-accent-soft px-1.5 font-medium whitespace-nowrap text-accent-ink">{conv.detected}</span>
+            <span className="max-w-full truncate" title={src.filename}>
               {src.filename}
             </span>
             <span>· {facts.join(" · ")}</span>
@@ -154,9 +161,12 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
           type="button"
           disabled={busy}
           onClick={() => fileInput.current?.click()}
-          className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-surface-2 disabled:opacity-50"
+          aria-label="Autre fichier"
+          title="Convertir un autre fichier"
+          className="at-btn max-sm:w-[30px] max-sm:px-0"
         >
-          <FileUp className="size-3.5" aria-hidden /> Autre fichier
+          <FileUp className="size-3.5" aria-hidden />
+          <span className="max-sm:sr-only">Autre fichier</span>
         </button>
         <input
           ref={fileInput}
@@ -174,7 +184,7 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
       </div>
 
       {conv.warnings.length > 0 && (
-        <ul className="space-y-1 rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-xs text-warning" aria-label="Avertissements">
+        <ul className="at-alert at-alert--warn space-y-1 px-3 py-2 text-xs" aria-label="Avertissements">
           {conv.warnings.map((w) => (
             <li key={w} className="flex items-start gap-1.5">
               {w.startsWith("Table proposée") ? <Info className="mt-px size-3.5 shrink-0" aria-hidden /> : <TriangleAlert className="mt-px size-3.5 shrink-0" aria-hidden />}
@@ -186,7 +196,7 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
 
       {conv.statement && <StatementCard statement={conv.statement} />}
 
-      <div className="flex min-h-0 flex-1 flex-col gap-4 xl:flex-row">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 lg:gap-4 xl:flex-row">
         <div className="flex min-h-[24rem] min-w-0 flex-1 flex-col">
           <PreviewTable
             columns={conv.table_columns}
@@ -199,7 +209,7 @@ export function Workbench({ id, info }: { id: string; info: AppInfo | null }) {
             onMore={rows.length < conv.rows ? () => void more() : null}
           />
         </div>
-        <aside className="w-full shrink-0 space-y-3 overflow-y-auto xl:w-72" aria-label="Actions">
+        <aside className="w-full shrink-0 space-y-2 overflow-y-auto xl:w-72" aria-label="Actions">
           <TabPanel conversion={conv} onSent={() => void api.conversions.get(conv.id).then(show)} />
           <ExportPanel conversionId={conv.id} />
           <OptionsPanel conversion={conv} busy={busy} onApply={reparse} />

@@ -1,10 +1,25 @@
 /// <reference types="vitest/config" />
+import { readFileSync } from "node:fs";
+
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { type Plugin, defineConfig } from "vite";
+
+/**
+ * Préférence de thème commune à la suite (docs/SUITE.md §1.5) : la copie verbatim de `atelier-theme.js` est
+ * insérée telle quelle en tête de <head>, en script bloquant, pour poser le thème avant le premier affichage
+ * (en développement comme dans `dist/`, sans fichier à servir à part).
+ */
+function atelierTheme(): Plugin {
+  const file = new URL("./src/styles/atelier-brand/atelier-theme.js", import.meta.url);
+  return {
+    name: "atelier-theme",
+    transformIndexHtml: () => [{ tag: "script", children: readFileSync(file, "utf8"), injectTo: "head-prepend" }],
+  };
+}
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [atelierTheme(), react(), tailwindcss()],
   // docs/SUITE.md §2 : 127.0.0.1:5176, échec explicite si le port est pris.
   server: {
     host: "127.0.0.1",

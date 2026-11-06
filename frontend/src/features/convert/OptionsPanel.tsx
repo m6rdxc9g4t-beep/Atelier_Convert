@@ -69,7 +69,7 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
                 />
               </Field>
             </div>
-            <p className="text-[11px] text-muted">Pages : « 1-3,5 ». Année : pour les dates écrites sans année (« 15/03 ») si la période n'est pas reconnue.</p>
+            <p className="text-xs text-muted">Pages : « 1-3,5 ». Année : pour les dates écrites sans année (« 15/03 ») si la période n'est pas reconnue.</p>
             <Field label="Reconnaissance de texte (OCR)" hint="Auto : seulement pour un PDF scanné (sans texte). Toujours : relit les pages comme des images.">
               <Segmented
                 label="Reconnaissance de texte (OCR)"
@@ -86,7 +86,7 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
         )}
 
         {kind === "image" && (
-          <p className="text-[11px] text-muted">
+          <p className="text-xs text-muted">
             Image lue par OCR (Tesseract, sur la machine). Pour un meilleur résultat : document à plat, bien éclairé, photographié de face.
           </p>
         )}
@@ -183,7 +183,7 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
         </div>
 
         <div className="flex items-center gap-2 pt-1">
-          <button type="button" disabled={busy || !dirty} onClick={() => onApply(opts)} className="atelier-btn-primary flex-1 rounded-md px-3 py-1.5 text-sm font-medium disabled:opacity-40">
+          <button type="button" disabled={busy || !dirty} onClick={() => onApply(opts)} className="at-btn flex-1">
             Relire le fichier
           </button>
           <button
@@ -192,15 +192,15 @@ export function OptionsPanel({ conversion, busy, onApply }: { conversion: Conver
             onClick={() => setOpts(DEFAULT_OPTIONS)}
             title="Revenir à la détection automatique"
             aria-label="Revenir à la détection automatique"
-            className="rounded-md border border-border p-2 text-muted hover:bg-surface-2 hover:text-fg disabled:opacity-40"
+            className="at-btn at-btn--icon text-muted"
           >
             <RotateCcw className="size-3.5" aria-hidden />
           </button>
         </div>
         {dirty && (
-          <p className="text-[11px] text-muted">
+          <p className="text-xs text-muted">
             La relecture recalcule les colonnes : vos renommages et types sont remis à zéro
-            {edits > 0 && <span className="text-warning">, et vos {edits} correction(s) de cellules perdues</span>}.
+            {edits > 0 && <span className="font-medium text-warning">, et vos {edits} correction(s) de cellules perdues</span>}.
           </p>
         )}
       </div>
