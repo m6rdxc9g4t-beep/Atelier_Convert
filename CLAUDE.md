@@ -73,12 +73,21 @@ bureau ne réutilise qu'un serveur Convert. Tout nouveau réglage de `Settings` 
 
 ## Suite Atelier et design
 - Contrat commun : `docs/SUITE.md` (Convert : §4.4 et les lignes « Convert » ; à reporter dans les autres dépôts).
-- `frontend/src/styles/atelier-ds/` et `styles/atelier-brand/` : copies **verbatim** (jamais modifiées ici).
-  La signature de Convert (`#C9951D`, `data-atelier-app="convert"`) est déclarée dans `index.css` (la marque source ne la
-  connaît pas encore) avec `:root[data-atelier-app="convert"]` pour l'emporter sur le `:root` neutre de la marque.
-- Classes de la charte : `atelier-card`, `atelier-pop`, `atelier-btn-primary`, `atelier-nav-active`, `atelier-title` ;
-  texte en couleur : `text-accent-ink` ; fonds `bg-accent-soft` / `bg-accent-faint` ; champs `bg-field`.
-- Logo et icônes : `scripts/brand/make_logo.py` (Chromium via Playwright) → `frontend/src/assets`, `frontend/public`,
+- `frontend/src/styles/atelier-ds/` et `styles/atelier-brand/` : copies **verbatim** d'Atelier_Projets/design-system (charte v2
+  « Linear » : `atelier-brand.css`, `atelier-theme.js`, police Inter + licence ; thèmes et couleurs), jamais modifiées ici ;
+  `designSystem.test.ts` les compare à l'octet près à la source quand le dépôt voisin est présent. Règles : `Atelier_Deploy/DESIGN.md`.
+- Signature de Convert : ocre `#9d6d1c` (`data-atelier-app="convert"` sur `<html>`, déclarée par la marque commune). Elle ne sert
+  qu'à l'accent : bouton principal (un seul par écran), sélection, focus, liens, icône de l'app. Structure neutre (jetons
+  `--atelier-*` branchés dans `index.css`), plat au repos (pas de halo, de grille, de lueur ni de `text-shadow`).
+- Thème : `atelier-theme.js` est inséré en tête de `<head>` par `vite.config.ts` (script bloquant) ; `useTheme` passe par
+  `window.atelierTheme` (préférence commune à la suite, `localStorage["atelier:theme"]` ou cookie sur le VPS) ; choix
+  Système / Clair / Sombre au pied de la barre latérale (`ThemeSwitch`) et dans les Réglages.
+- Classes : `atelier-card` (carte plate), `atelier-pop` (menus, notifications : seuls à porter une ombre), `atelier-btn-primary`,
+  `atelier-nav-active` ; composants de `index.css` : `at-btn` (+ `--ghost`, `--icon`, `--sm`, `--lg`), `at-input`, `at-seg`,
+  `at-tag`, `at-row`, `at-alert`. Texte en couleur : `text-accent-ink` ; sélection `bg-accent-soft` ; erreurs `text-danger`,
+  avertissements `text-warning` ; montants (données) `text-negative` / `text-positive` inchangés.
+- Coquille : barre latérale 232 px (rail d'icônes sous 1024 px), barre haute 44 px, base 13 px (14 px sur téléphone).
+- Icônes : `scripts/brand/make_logo.py` (Chromium via Playwright) dessine l'icône carrée → `frontend/public` (favicons),
   `scripts/macos/icon.png`, `scripts/windows/atelier-convert.ico`, `docs/brand/`.
 
 ## Règles de code
