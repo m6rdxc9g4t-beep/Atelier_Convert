@@ -277,8 +277,17 @@ class DesktopApi:
 # --- Lancement ----------------------------------------------------------------------------------
 
 
-_PAGE_STYLE = (
-    "font:15px -apple-system,system-ui,sans-serif;display:grid;place-items:center;height:90vh;margin:0;color:#1f2328"
+# Pages affichées avant l'interface (erreur, mise à jour) : autonomes, aux couleurs de la structure de la suite
+# (crème en clair, bleu nuit en sombre, atelier-brand.css §2 et §3) et de la signature ocre de Convert.
+_PAGE_CSS = (
+    ":root{--bg:#f8f4ec;--fg:#1f1b16;--muted:#5f574b;--line:#cfc2a9;--accent:#9d6d1c;--danger:#b92b27;"
+    "color-scheme:light}"
+    "@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--fg:#e6eaf2;--muted:#a3aec2;--line:#2d3b57;"
+    "--danger:#ff6b6b;color-scheme:dark}}"
+    'body{font:14px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);'
+    "margin:0;height:100vh;display:grid;place-items:center;-webkit-font-smoothing:antialiased}"
+    "main{max-width:34rem;padding:2rem}h1{font-size:17px;font-weight:600;margin:0 0 .75rem}p{margin:.5rem 0}"
+    ".muted{color:var(--muted);font-size:13px}.err{color:var(--danger)}"
 )
 
 
@@ -300,10 +309,10 @@ def error_page(message: str) -> str:
     """Page affichée dans la fenêtre quand le démarrage échoue."""
     hint = html.escape(f"Journal : {_shown_path(app_log_file())}")
     return (
-        f'<!doctype html><meta charset="utf-8"><title>{APP_NAME}</title>'
-        f'<body style="{_PAGE_STYLE}"><div style="max-width:34rem;padding:2rem">'
-        f'<h1 style="font-size:18px">{APP_NAME} ne peut pas démarrer</h1><p>{html.escape(message)}</p>'
-        f'<p style="color:#656d76;font-size:13px">{hint}</p></div>'
+        f'<!doctype html><html lang="fr"><meta charset="utf-8"><title>{APP_NAME}</title>'
+        f"<style>{_PAGE_CSS}</style><main>"
+        f"<h1>{APP_NAME} ne peut pas démarrer</h1><p>{html.escape(message)}</p>"
+        f'<p class="muted">{hint}</p></main>'
     )
 
 
@@ -543,15 +552,11 @@ def run_update(
     return ask(session) == "previous"
 
 
-_SPLASH = """<!doctype html><html lang="fr"><meta charset="utf-8"><title>__APP__</title>
-<style>
-:root{--bg:#fbfbfc;--fg:#1a1b1e;--muted:#5f636c;--line:#d0d2d8;--accent:#9d6d1c;--danger:#c9302b;color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1012;--fg:#e8e9ec;--muted:#969aa3;--line:#33353c;--danger:#ff6b6b;
-color-scheme:dark}}
-body{font:14px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);margin:0;
-height:100vh;display:grid;place-items:center;-webkit-font-smoothing:antialiased}
-main{max-width:34rem;padding:2rem}h1{font-size:17px;font-weight:600;margin:0 0 .75rem}p{margin:.5rem 0}
-.muted{color:var(--muted);font-size:13px}.err{color:var(--danger)}
+_SPLASH = (
+    """<!doctype html><html lang="fr"><meta charset="utf-8"><title>__APP__</title>
+<style>"""
+    + _PAGE_CSS
+    + """
 .spin{width:20px;height:20px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;
 animation:r 1s linear infinite;margin-bottom:1rem}@keyframes r{to{transform:rotate(360deg)}}
 button{font-family:inherit;font-size:13px;font-weight:500;height:30px;padding:0 12px;border-radius:7px;
@@ -612,6 +617,7 @@ $("previous").addEventListener("click", () => choose("previous"));
 $("quit").addEventListener("click", () => choose("quit"));
 poll();
 </script></html>"""
+)
 
 
 def splash_page() -> str:
