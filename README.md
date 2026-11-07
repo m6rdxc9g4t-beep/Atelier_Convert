@@ -12,7 +12,7 @@ qui crée directement la table dans le projet choisi.
 - **Hors ligne par défaut** : la lecture des fichiers, les exports et l'envoi vers Tab se font sur la machine.
 - **IA facultative** (« Structurer avec l'IA ») pour un document que la lecture automatique ne sait pas mettre en
   table : Ollama en local, ou Claude (CLI Claude Code, isolée et sans outils) en mode « En ligne ».
-- Même design que la suite : charte v2 « Linear » (structure neutre gris froid, police Inter embarquée),
+- Même design que la suite : charte v2 « Linear » (crème en clair, bleu nuit en sombre, police Inter embarquée),
   couleur signature **ocre `#9d6d1c`** pour l'accent, icône `arrow-left-right`, sélecteur « Suite Atelier »,
   thème système / clair / sombre commun à la suite.
 - Conventions pour Claude : [`CLAUDE.md`](CLAUDE.md) · contrat commun de la suite : [`docs/SUITE.md`](docs/SUITE.md) (§4.4).

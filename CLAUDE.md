@@ -77,12 +77,14 @@ bureau ne réutilise qu'un serveur Convert. Tout nouveau réglage de `Settings` 
   « Linear » : `atelier-brand.css`, `atelier-theme.js`, police Inter + licence ; thèmes et couleurs), jamais modifiées ici ;
   `designSystem.test.ts` les compare à l'octet près à la source quand le dépôt voisin est présent. Règles : `Atelier_Deploy/DESIGN.md`.
 - Signature de Convert : ocre `#9d6d1c` (`data-atelier-app="convert"` sur `<html>`, déclarée par la marque commune). Elle ne sert
-  qu'à l'accent : bouton principal (un seul par écran), sélection, focus, liens, icône de l'app. Structure neutre (jetons
-  `--atelier-*` branchés dans `index.css`), plat au repos (pas de halo, de grille, de lueur ni de `text-shadow`).
+  qu'à l'accent : bouton principal (un seul par écran), sélection, focus, liens, icône de l'app. Structure commune à la suite,
+  crème en clair (`#f8f4ec`) et bleu nuit en sombre (`#0b1220`) (jetons `--atelier-*` branchés dans `index.css` ; pages
+  d'avant l'interface de `app/desktop.py` : mêmes valeurs fixes, `_PAGE_CSS`), plat au repos (pas de halo, de grille, de
+  lueur ni de `text-shadow`).
 - Thème : `atelier-theme.js` est inséré en tête de `<head>` par `vite.config.ts` (script bloquant) ; `useTheme` passe par
   `window.atelierTheme` (préférence commune à la suite, `localStorage["atelier:theme"]` ou cookie sur le VPS) ; choix
   Système / Clair / Sombre au pied de la barre latérale (`ThemeSwitch`) et dans les Réglages.
-- Classes : `atelier-card` (carte plate), `atelier-pop` (menus, notifications : seuls à porter une ombre), `atelier-btn-primary`,
+- Classes : `atelier-card` (carte plate), `atelier-kpi` (carte de chiffres : synthèse du relevé, coins de 12 px), `atelier-pop` (menus, notifications : seuls à porter une ombre), `atelier-btn-primary`,
   `atelier-nav-active` ; composants de `index.css` : `at-btn` (+ `--ghost`, `--icon`, `--sm`, `--lg`), `at-input`, `at-seg`,
   `at-tag`, `at-row`, `at-alert`. Texte en couleur : `text-accent-ink` ; sélection `bg-accent-soft` ; erreurs `text-danger`,
   avertissements `text-warning` ; montants (données) `text-negative` / `text-positive` inchangés.

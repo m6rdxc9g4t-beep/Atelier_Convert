@@ -9,8 +9,8 @@
 
 /*
  * Habillage de l'application (docs/SUITE.md §1.2 et §1.7, charte v2 « Linear ») : mêmes noms de jetons qu'Atelier Viz ;
- * leurs valeurs viennent des jetons --atelier-* d'atelier-brand.css (copie verbatim). Structure neutre gris froid,
- * commune à la suite ; la signature d'Atelier Convert (ocre #9d6d1c, data-atelier-app="convert" sur <html>) ne sert
+ * leurs valeurs viennent des jetons --atelier-* d'atelier-brand.css (copie verbatim). Structure commune à la suite,
+ * crème en clair, bleu nuit en sombre ; la signature d'Atelier Convert (ocre #9d6d1c, data-atelier-app="convert" sur <html>) ne sert
  * qu'à l'accent : bouton principal, sélection, focus, liens, icône de l'app.
  */
 :root,
@@ -436,6 +436,14 @@ input[type="checkbox"] {
 }
 .convert-table td.num.cell-editing input {
   text-align: right;
+}
+
+/* Cartes de chiffres (`atelier-kpi`, atelier-brand.css) : montants un cran plus petits sur téléphone, pour en tenir
+   deux par ligne sans les couper (sélecteur doublé : la marque est chargée après ce fichier). */
+@media (max-width: 639px) {
+  .atelier-kpi .atelier-kpi__value {
+    font-size: 1.125rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

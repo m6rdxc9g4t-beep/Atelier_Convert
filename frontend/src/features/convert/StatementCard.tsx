@@ -4,31 +4,42 @@ import { CircleCheck, CircleHelp, TriangleAlert } from "lucide-react";
 import { formatDate, formatMoney } from "../../lib/format";
 import type { StatementSummary } from "../../types/convert";
 
-/** Synthèse d'un relevé : période, totaux, soldes et contrôle « solde initial + opérations = solde final ». */
+/**
+ * Synthèse d'un relevé : rangée de cartes de chiffres (`atelier-kpi`, coins de 12 px) — opérations et période,
+ * débits, crédits, soldes — puis le contrôle « solde initial + opérations = solde final ».
+ */
 export function StatementCard({ statement }: { statement: StatementSummary }) {
   const s = statement;
-  const items: [string, string][] = [
-    ["Période", s.start && s.end ? `${formatDate(s.start)} → ${formatDate(s.end)}` : "—"],
-    ["Opérations", String(s.transactions)],
-    ["Débits", formatMoney(s.total_debit)],
-    ["Crédits", formatMoney(s.total_credit)],
+  const period = s.start && s.end ? `${formatDate(s.start)} → ${formatDate(s.end)}` : null;
+  const items: { label: string; value: string; note?: string }[] = [
+    { label: "Opérations", value: String(s.transactions), note: period ?? "Période inconnue" },
+    { label: "Débits", value: formatMoney(s.total_debit) },
+    { label: "Crédits", value: formatMoney(s.total_credit) },
   ];
-  if (s.opening_balance !== null) items.push(["Solde initial", formatMoney(s.opening_balance)]);
-  if (s.closing_balance !== null) items.push(["Solde final", formatMoney(s.closing_balance)]);
+  if (s.opening_balance !== null) items.push({ label: "Solde initial", value: formatMoney(s.opening_balance) });
+  if (s.closing_balance !== null) items.push({ label: "Solde final", value: formatMoney(s.closing_balance) });
 
   return (
-    <section aria-label="Synthèse du relevé" className="atelier-card px-4 py-3">
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-2.5 sm:grid-cols-3 xl:grid-cols-7">
-        {items.map(([label, value], i) => (
-          <div key={label} className={clsx("min-w-0", i === 0 && "col-span-2 sm:col-span-1 xl:col-span-2")}>
-            <dt className="text-xs text-muted">{label}</dt>
-            <dd className="mt-0.5 truncate text-base font-semibold tabular-nums">{value}</dd>
+    <section aria-label="Synthèse du relevé" className="space-y-2">
+      <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-5">
+        {items.map(({ label, value, note }, i) => (
+          <div key={label} className={clsx("atelier-kpi", i === 0 && "col-span-2 sm:col-span-1")}>
+            <dt className="atelier-kpi__label">{label}</dt>
+            <dd className="atelier-kpi__value truncate" title={value}>
+              {value}
+            </dd>
+            {note && (
+              <dd className="atelier-kpi__note truncate">
+                <span className="sr-only">Période : </span>
+                {note}
+              </dd>
+            )}
           </div>
         ))}
       </dl>
       <p
         className={clsx(
-          "mt-3 flex items-start gap-1.5 border-t border-line pt-2.5 text-xs",
+          "flex items-start gap-1.5 px-1 text-xs",
           s.balance_check === "mismatch" ? "font-medium text-danger" : "text-muted",
         )}
       >
