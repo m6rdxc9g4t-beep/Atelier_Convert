@@ -1,7 +1,6 @@
 # Suite Atelier — contrat commun
 
-Ce document est **identique** dans les dépôts de la suite (`Atelier_Viz`, `atelier-tab`, `Atelier_Projets`, `Atelier_Convert`), sous `docs/SUITE.md`.
-*Ajouts d'Atelier Convert (§2, §3, §4.4, §7, §8.3, §9) : à reporter dans les autres dépôts. §1 : charte v2 « Linear », reprise d'Atelier_Projets.*
+Ce document est **identique** dans les trois dépôts (`Atelier_Viz`, `atelier-tab`, `Atelier_Projets`), sous `docs/SUITE.md`.
 Il fixe ce que les trois applications partagent : identité visuelle, ports, navigation, échanges de données, le contrat de nœud de workflow (§7) qu'Atelier Nexus utilise pour les enchaîner, la mise à jour automatique des apps de bureau (§8), et l'installation sous Windows avec l'ouverture des apps entre elles (§9).
 Toute modification se fait dans les trois dépôts à la fois.
 
@@ -10,7 +9,6 @@ Toute modification se fait dans les trois dépôts à la fois.
 | **Atelier Viz** | BI locale (rapports, visuels, IA) | FastAPI + DuckDB · React |
 | **Atelier Tab** | Tableur + base typée | React · Electron (bureau) |
 | **Atelier Projets** | Projets agiles, Git, temps passé | Fastify + Prisma/SQLite · React |
-| **Atelier Convert** | Conversion de relevés et fichiers (PDF, CSV, TXT, XLSX, OFX, QIF) en tables pour Tab | FastAPI + pdfplumber · React |
 
 Principes partagés : **local d'abord** (rien ne quitte la machine hors ligne), interface **en français**, IA locale par Ollama (`http://localhost:11434`), clair + sombre (charte v2 « Linear » : structure neutre commune, couleur signature de chaque app pour l’accent, §1.7).
 
@@ -150,7 +148,6 @@ Apps du foyer (Dates, Suivi, Cuisine) : même charte, mais toute la structure (f
 | Atelier Viz | `http://127.0.0.1:5173` | `http://127.0.0.1:8000` (servie par FastAPI) | `http://127.0.0.1:8000/api` |
 | Atelier Projets | `http://127.0.0.1:5174` | `http://127.0.0.1:4174` | `http://127.0.0.1:3000/api` |
 | Atelier Tab | `http://127.0.0.1:5175` | `http://127.0.0.1:4175` · app Electron | santé seulement : `http://127.0.0.1:4175/api/health` (app de bureau ou aperçu), `http://127.0.0.1:5175/api/health` (dev) |
-| Atelier Convert | `http://127.0.0.1:5176` | `http://127.0.0.1:8010` (servie par FastAPI) | `http://127.0.0.1:8010/api` (`/api/health` → `{"status":"ok","app":"atelier-convert",…}`) |
 
 `strictPort: true` sur chaque serveur Vite : en cas de conflit, échec explicite plutôt qu'un port au hasard.
 
@@ -167,8 +164,8 @@ Chaque en-tête d'application porte un **sélecteur « Suite Atelier »** (icôn
   - dans un navigateur : nouvel onglet ;
   - dans une app de bureau (macOS) : l'enveloppe de bureau reconnaît l'adresse d'une app de la suite et **ouvre l'application installée**
     (`/usr/bin/open -b <identifiant>`), sinon l'adresse part dans le navigateur par défaut.
-    Identifiants : Viz `fr.atelier-viz.app`, Tab `fr.atelier.tab`, Projets `local.atelier-projets.desktop`, Cuisine `fr.ateliercuisine.app`, Convert `fr.atelier-convert.app`.
-    Reconnaissance par hôte (`127.0.0.1` ou `localhost`) et port : 8000 → Viz, 4175 → Tab, 4174 → Projets, 8010 → Convert ;
+    Identifiants : Viz `fr.atelier-viz.app`, Tab `fr.atelier.tab`, Projets `local.atelier-projets.desktop`, Cuisine `fr.ateliercuisine.app`.
+    Reconnaissance par hôte (`127.0.0.1` ou `localhost`) et port : 8000 → Viz, 4175 → Tab, 4174 → Projets ;
     Cuisine par son adresse en ligne `https://atelier-cuisine-iota.vercel.app` (app Mac Tauri si installée, sinon la PWA dans le navigateur).
     Mécanisme : `DesktopApi.open_external` (Viz), `shell.openExternal` relayé par le processus principal (Tab), `setWindowOpenHandler` (Projets) ;
 - Atelier Cuisine est une app en ligne (PWA + app Mac Tauri, données Supabase) : pas d'API locale, donc **pas d'indicateur**
@@ -186,7 +183,7 @@ Les adresses sont des constantes dans un module dédié (`suite.ts`), surchargea
 (`VITE_ATELIER_VIZ_URL`, `VITE_ATELIER_TAB_URL`, `VITE_ATELIER_PROJETS_URL`, et, dans Tab, `VITE_ATELIER_PROJETS_API_URL` pour l'adresse de santé de Projets).
 Dans une app, l'état de l'app courante se vérifie sur sa propre origine (`/api/health`), pas à l'adresse fixe.
 
-Nom affiché : **Atelier Viz**, **Atelier Tab**, **Atelier Projets** (avec une espace) dans les titres de fenêtre et noms accessibles ; « atelier_Nom » dans la marque (§1.6).
+Nom affiché : **Atelier Viz**, **Atelier Tab**, **Atelier Projets** (avec une espace) dans les titres de fenêtre et noms accessibles ; « Atelier Nom » dans la marque (§1.6 : « Atelier » en gris, le nom en gras).
 Les noms techniques (dépôts, dossier `~/Atelier_Tab`, paquets) ne changent pas.
 
 ---
@@ -218,6 +215,8 @@ Correspondance des colonnes (`atelier_mapping`) :
 | `workflow_state` | `status` (règles §1.4 ; inconnu → `OPEN` + avertissement) |
 | `start_date` / `due_date` | `startDate` / `dueDate` (ISO `AAAA-MM-JJ`) |
 | `description` | début de `description` |
+| `item_type` | `type` : `Feature` / `Task` / `Bug` (codes, libellés français ou anglais) ; autre libellé (Epic, Story…) → type du paramètre `type`, un seul avertissement récapitulatif |
+| `time_spent` | temps passé **en heures** : une saisie de temps (`TimeEntry`, commentaire « Import Atelier Tab ») datée de `due_date`, sinon `start_date`, sinon du jour ; un réimport la met à jour ou la retire (valeur vide), sans toucher aux temps saisis à la main ; valeur illisible, négative ou > 100 000 h → ignorée + avertissement |
 | autres (`assignee`, `financial_ht`, `financial_ttc`, `quantity`, `flag`, `custom`) | tableau Markdown « Données Atelier Tab » ajouté à `description` |
 
 Identité : chaque élément importé garde `externalRef = "atelier-tab:<source_table.id ?? project.id>:<record_id>"` ; un réimport **met à jour** l'élément au lieu d'en créer un autre.
@@ -260,25 +259,6 @@ Les clés sont en `snake_case` sans accent (`heures_estimees`), les libellés en
 
 **Viz** ajoute un connecteur **« Atelier Projets »** : adresse (défaut `http://127.0.0.1:3000`), choix du jeu et du projet (facultatif), import et actualisation.
 Adresse **locale uniquement**, quel que soit le mode : `127.0.0.1`, `localhost` ou `::1` (après résolution).
-
-### 4.4 Convert → Tab : nouvelle table dans un projet
-**Convert** lit un fichier (relevé bancaire PDF — y compris scanné ou photographié, par OCR Tesseract sur la machine —,
-CSV, TXT, XLSX/XLS, OFX/QFX, QIF, JSON) et en fait une table typée.
-« Envoyer dans Atelier Tab » écrit **une nouvelle table** dans le dossier de données de Tab (défaut `~/Atelier_Tab`,
-`ATELIER_TAB_DATA_DIR` côté Convert) : un seul fichier `tables/<tbl_id>.json` au format `atelier_tab` v1
-(`src/storage/format.ts` de Tab), `projectId` = projet choisi parmi ceux de `atelier.json`.
-
-- Convert **ne modifie jamais** `atelier.json` ni une table existante ; écriture atomique (fichier caché temporaire
-  puis renommage). Tab rattache la table à son projet (`assembleData`) et, ouvert, l'affiche aussitôt (surveillance du dossier).
-- Identifiants au format de Tab (`tbl_`, `fld_`, `rec_`, `view_` + 10 caractères `[0-9a-z]`) ; une vue « Grille » (`hybrid`).
-- Types : texte → `text`, nombre → `number`, montant → `currency` (`EUR`, 2 décimales), date → `date` (`AAAA-MM-JJ`),
-  oui/non → `checkbox`. Le libellé (sinon la première colonne texte) reçoit `entity_title`, les autres `custom`.
-  Une cellule vide est absente ; un texte commençant par « = » est précédé d'une apostrophe (jamais une formule).
-- Relevé bancaire : colonnes normalisées Date, Date de valeur (si présente), Libellé, Débit, Crédit (positifs),
-  Montant (signé : crédit − débit), Solde (si présent), puis les autres colonnes du fichier.
-- Exports aussi disponibles : CSV français (`;`, virgule décimale, `JJ/MM/AAAA`, UTF-8 avec BOM), CSV standard,
-  TXT tabulé, XLSX typé, JSON `atelier-table/1` (§7.2).
-- Aucun réseau ; hors ligne comme en ligne.
 
 ---
 
@@ -356,7 +336,6 @@ sous les gardes existantes (`local-only`, §5.1). Aucune action du manifeste ne 
 | Atelier Viz | `GET http://127.0.0.1:8000/api/atelier/manifest` |
 | Atelier Projets | `GET http://127.0.0.1:3000/api/atelier/manifest` |
 | Atelier Tab | outil MCP `atelier_manifest` (sans argument, lecture seule) **et** fichier `~/Atelier_Tab/exports/_atelier/manifest.json` réécrit au démarrage de l'app |
-| Atelier Convert | `GET http://127.0.0.1:8010/api/atelier/manifest` (`app: "convert"`) |
 
 ```json
 {
@@ -462,14 +441,6 @@ Format unique des tables qui passent d'une étape à l'autre (même forme que le
 | Projets | `projets.import.completed` | `project` | `source`, `created`, `updated`, `skipped` |
 | Tab | `tab.table.changed` | `table` | `revision`, `rows`, `project` |
 | Tab | `tab.table.deleted` | `table` | — |
-| Convert | `convert.conversion.created` | `conversion` | `name`, `format`, `rows`, `columns`, `statement`, `origin` (`interface` / `workflow` / `ai`) |
-| Convert | `convert.conversion.updated` | `conversion` | `rows`, `columns`, `reason` (`options` / `columns` / `ai` / `rename`) |
-| Convert | `convert.conversion.sent_to_tab` | `conversion` | `table_id`, `table_name`, `project_id`, `rows` |
-| Convert | `convert.conversion.deleted` | `conversion` | — |
-
-Actions de Convert : `conversions.list`, `conversions.table` (`atelier-table/1`), `conversions.convert_file`
-(fichier en base64, jamais un chemin ; `Idempotency-Key`), `tab.projects`, `conversions.send_to_tab` (`Idempotency-Key`),
-`conversions.delete` (`destructive`).
 
 Un changement de statut émet `status_changed` **et** `updated`. Un import émet un seul `import.completed` (pas un événement par ligne).
 
@@ -566,7 +537,6 @@ comme Atelier Projets (`desktop/lib/prepare.cjs`, modèle de référence). Aucun
 | Viz | `frontend/package-lock.json`, `backend/requirements*.txt` (environnement Python de l'app) | — | interface |
 | Tab | `package-lock.json` | — (fichiers JSON lus de façon tolérante) | interface + processus principal |
 | Nexus | `frontend/package-lock.json`, `backend/requirements*.txt` (venv de l'app) | Alembic, au démarrage du backend | interface (export statique) |
-| Convert | `frontend/package-lock.json`, `backend/requirements*.txt` (environnement Python de l'app) | — | interface |
 
 Tab : le serveur MCP livré dans l'app (`/Applications/Atelier_Tab.app/Contents/Resources/atelier-mcp`) garde ce chemin et lance
 la version du dépôt.
@@ -638,7 +608,7 @@ contenir des espaces et des accents (`C:\Users\François\…`) : toujours cités
   héritée qui désignerait autre chose que ses propres données (ex. Projets ignore un `DATABASE_URL` hérité au lancement de
   l'app de bureau).
 - macOS : `open -b <identifiant>` (inchangé). Windows : chaque app installée s'enregistre dans
-  `HKCU\Software\Atelier\Apps\<viz|tab|projets|nexus|convert>` (valeurs `Lanceur` = chemin complet, `Nom`) ; les autres apps y lisent le
+  `HKCU\Software\Atelier\Apps\<viz|tab|projets|nexus>` (valeurs `Lanceur` = chemin complet, `Nom`) ; les autres apps y lisent le
   lanceur et le démarrent, sinon ouvrent l'adresse (§2) dans le navigateur par défaut.
 
 ### 9.5 Vérification
