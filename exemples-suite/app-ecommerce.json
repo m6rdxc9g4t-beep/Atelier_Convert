@@ -1,0 +1,51 @@
+{
+ "format": "atelier-exemples/1",
+ "histoire": {
+  "id": "app-ecommerce",
+  "titre": "App E-Commerce v2",
+  "sous_titre": "Une boutique en ligne lance la v2 de son app",
+  "secteur": "Produit",
+  "resume": "Verveine & Co, boutique de thés en ligne, sort la v2 de son app en octobre : backlog et sprints, commandes du back-office, virements Stripe ; la pub du lancement dépasse son budget."
+ },
+ "tab": {
+  "projet_id": "prj_ex_app-ecommerce",
+  "projet": "App E-Commerce v2"
+ },
+ "fichiers": [
+  {
+   "fichier": "app-ecommerce/releve-2026-08.pdf",
+   "titre": "Relevé août 2026 (PDF)",
+   "description": "9 opérations, solde final 29 194,87 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé août 2026 — App E-Commerce v2"
+  },
+  {
+   "fichier": "app-ecommerce/releve-2026-09.pdf",
+   "titre": "Relevé septembre 2026 (PDF)",
+   "description": "10 opérations, solde final 17 816,96 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé septembre 2026 — App E-Commerce v2"
+  },
+  {
+   "fichier": "app-ecommerce/releve-2026-10.pdf",
+   "titre": "Relevé octobre 2026 (PDF)",
+   "description": "11 opérations, solde final 6 645,69 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé octobre 2026 — App E-Commerce v2"
+  },
+  {
+   "fichier": "app-ecommerce/commandes-back-office.csv",
+   "titre": "Commandes du back-office (CSV)",
+   "description": "Export des commandes d'août à octobre : numéro, produit, montant, canal (app v1, v2, site).",
+   "type": "csv",
+   "nom_conversion": "Commandes du back-office — App E-Commerce v2"
+  },
+  {
+   "fichier": "app-ecommerce/operations-2026-08-2026-10.csv",
+   "titre": "Opérations catégorisées (CSV)",
+   "description": "Les trois mois, catégorisés, au format CSV français : à importer dans Trésorerie.",
+   "type": "csv",
+   "nom_conversion": "Opérations catégorisées — App E-Commerce v2"
+  }
+ ]
+}

@@ -149,6 +149,34 @@ export interface StructureResult {
   conversion: ConversionView;
 }
 
+/** Exemples de la suite (miroir de backend/app/schemas/exemples.py). */
+export type SuiteExampleApp = "convert" | "tab" | "viz" | "tresorerie" | "nexus" | "projets" | "wiki";
+
+export interface ExempleEtape {
+  app: SuiteExampleApp;
+  titre: string;
+  texte: string;
+}
+
+export interface ExempleFichier {
+  index: number;
+  titre: string;
+  description: string;
+  type: "releve" | "csv";
+}
+
+export interface ExempleHistoire {
+  id: string;
+  titre: string;
+  sous_titre: string;
+  secteur: string;
+  resume: string;
+  parcours: ExempleEtape[];
+  fichiers: ExempleFichier[];
+  /** Projet d'Atelier Tab de l'histoire (créé en chargeant l'exemple dans Tab). */
+  tab_projet: string;
+}
+
 export interface SampleInfo {
   name: string;
   label: string;

@@ -8,6 +8,7 @@ import type {
   Column,
   ConversionSummary,
   ConversionView,
+  ExempleHistoire,
   ExportFormat,
   OcrStatus,
   ParseOptions,
@@ -123,6 +124,11 @@ export const api = {
   /** Reconnaissance de texte (Tesseract) : `refresh` revérifie tout de suite. */
   ocr: (refresh = false) => request<OcrStatus>(`/ocr${refresh ? "?refresh=true" : ""}`),
 
+  exemples: {
+    list: () => request<ExempleHistoire[]>("/exemples-suite"),
+    convert: (histoire: string, index: number) =>
+      request<ConversionView>(`/exemples-suite/${encodeURIComponent(histoire)}/${index}`, { method: "POST" }),
+  },
   samples: {
     list: () => request<SampleInfo[]>("/samples"),
     load: (name: string) => request<ConversionView>(`/samples/${encodeURIComponent(name)}`, { method: "POST" }),

@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     serve_frontend: bool = True
     # Fichiers d'exemple livrés avec le dépôt (bouton « Essayer avec un exemple »)
     samples_dir: Path = Path(__file__).resolve().parents[3] / "samples"
+    # Exemples de la suite (« Exemples de la suite ») : histoires fictives communes à toutes les apps, générées par
+    # Atelier_Deploy (exemples/generer.py) et copiées dans exemples-suite/.
+    convert_exemples_dir: Path = Path(__file__).resolve().parents[3] / "exemples-suite"
 
     # Conversion
     convert_max_rows: int = Field(default=200_000, ge=100, le=5_000_000)

@@ -7,6 +7,7 @@ import { KIND_LABELS, formatWhen } from "../../lib/format";
 import { conversionPath, navigate } from "../../lib/router";
 import type { ConversionSummary, SampleInfo } from "../../types/convert";
 import { Dropzone } from "./Dropzone";
+import { SuiteExamples } from "./SuiteExamples";
 
 const SAMPLE_ICONS: Record<string, typeof FileText> = { pdf: FileText, csv: FileSpreadsheet, ofx: Landmark };
 const SCAN_ICON = ScanText;
@@ -110,6 +111,8 @@ export function ConvertHome() {
           )}
         </section>
       </div>
+
+      <SuiteExamples busy={busy} setBusy={setBusy} />
     </div>
   );
 }

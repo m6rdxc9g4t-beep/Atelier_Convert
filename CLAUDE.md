@@ -62,6 +62,15 @@ Tab. Même architecture et même design qu'Atelier Viz (FastAPI + React), dont i
 - `conversions.convert_file` reçoit le fichier **en base64**, jamais un chemin (le nœud ne lit pas le disque à la demande).
 - Écritures qui créent : `Idempotency-Key` (`_idempotent` dans `routes/atelier.py`).
 
+## Exemples de la suite
+- `exemples-suite/` (format `atelier-exemples/1`) : histoires fictives communes à toute la suite, **générées** par
+  Atelier_Deploy (`exemples/generer.py --vers <dossier des dépôts>`), jamais modifiées à la main ici. Convert y lit, pour
+  chaque histoire, ses relevés PDF et ses CSV (`<histoire>.json` › `fichiers`).
+- `app/services/exemples.py` (lecture seule ; un fichier n'est servi que s'il est déclaré par son histoire et situé dans
+  le dossier), routes `GET /api/exemples-suite`, `POST /api/exemples-suite/{histoire}/{index}` ; réglage
+  `CONVERT_EXEMPLES_DIR`. Front : `SuiteExamples` (accueil) et `lib/exemples.ts` (étape courante, suivante, histoire mémorisée).
+- `tests/test_exemples.py` convertit **tous** les relevés livrés et exige des soldes justes.
+
 ## Application de bureau
 Reprise d'Atelier Viz (voir son CLAUDE.md) : `backend/desktop.py` → `app/desktop.py` (pywebview + uvicorn, port 8010),
 `app/launcher.py` (mise à jour automatique après `git pull`, docs/SUITE.md §8), `app/suite_apps.py` (ouvrir une autre app,

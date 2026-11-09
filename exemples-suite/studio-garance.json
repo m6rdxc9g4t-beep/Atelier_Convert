@@ -1,0 +1,44 @@
+{
+ "format": "atelier-exemples/1",
+ "histoire": {
+  "id": "studio-garance",
+  "titre": "Studio Garance",
+  "sous_titre": "Clôture comptable d'un studio de design",
+  "secteur": "Compta",
+  "resume": "Un studio de design graphique d'Arles clôture son mois : relevés bancaires convertis, catégorisés, comparés au budget ; le poste Matériel dépasse et devient une tâche de suivi."
+ },
+ "tab": {
+  "projet_id": "prj_ex_studio-garance",
+  "projet": "Compta 2026"
+ },
+ "fichiers": [
+  {
+   "fichier": "studio-garance/releve-2026-08.pdf",
+   "titre": "Relevé août 2026 (PDF)",
+   "description": "13 opérations, solde final 3 462,45 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé août 2026 — Studio Garance"
+  },
+  {
+   "fichier": "studio-garance/releve-2026-09.pdf",
+   "titre": "Relevé septembre 2026 (PDF)",
+   "description": "14 opérations, solde final 4 210,35 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé septembre 2026 — Studio Garance"
+  },
+  {
+   "fichier": "studio-garance/releve-2026-10.pdf",
+   "titre": "Relevé octobre 2026 (PDF)",
+   "description": "14 opérations, solde final 6 605,87 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé octobre 2026 — Studio Garance"
+  },
+  {
+   "fichier": "studio-garance/operations-2026-08-2026-10.csv",
+   "titre": "Opérations catégorisées (CSV)",
+   "description": "Les trois mois, catégorisés, au format CSV français : à importer dans Trésorerie.",
+   "type": "csv",
+   "nom_conversion": "Opérations catégorisées — Studio Garance"
+  }
+ ]
+}
