@@ -1,0 +1,51 @@
+{
+ "format": "atelier-exemples/1",
+ "histoire": {
+  "id": "finance-patrimoine",
+  "titre": "Lemaire Patrimoine",
+  "sous_titre": "Portefeuille et allocation d'une holding familiale",
+  "secteur": "Finance",
+  "resume": "La holding de la famille Lemaire place sa trésorerie : achats d'ETF, dividendes, comité mensuel, allocation cible ; les frais de courtage d'octobre dépassent l'enveloppe après un rééquilibrage."
+ },
+ "tab": {
+  "projet_id": "prj_ex_finance-patrimoine",
+  "projet": "Allocation 2026"
+ },
+ "fichiers": [
+  {
+   "fichier": "finance-patrimoine/releve-2026-08.pdf",
+   "titre": "Relevé août 2026 (PDF)",
+   "description": "7 opérations, solde final 196 678,28 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé août 2026 — Lemaire Patrimoine"
+  },
+  {
+   "fichier": "finance-patrimoine/releve-2026-09.pdf",
+   "titre": "Relevé septembre 2026 (PDF)",
+   "description": "7 opérations, solde final 191 271,17 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé septembre 2026 — Lemaire Patrimoine"
+  },
+  {
+   "fichier": "finance-patrimoine/releve-2026-10.pdf",
+   "titre": "Relevé octobre 2026 (PDF)",
+   "description": "11 opérations, solde final 198 454,55 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé octobre 2026 — Lemaire Patrimoine"
+  },
+  {
+   "fichier": "finance-patrimoine/operations-compte-titres.csv",
+   "titre": "Opérations du compte-titres (CSV)",
+   "description": "Export du courtier : ordres, quantités, cours, frais et montant net.",
+   "type": "csv",
+   "nom_conversion": "Opérations du compte-titres — Lemaire Patrimoine"
+  },
+  {
+   "fichier": "finance-patrimoine/operations-2026-08-2026-10.csv",
+   "titre": "Opérations catégorisées (CSV)",
+   "description": "Les trois mois, catégorisés, au format CSV français : à importer dans Trésorerie.",
+   "type": "csv",
+   "nom_conversion": "Opérations catégorisées — Lemaire Patrimoine"
+  }
+ ]
+}

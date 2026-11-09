@@ -42,6 +42,10 @@ winget install UB-Mannheim.TesseractOCR                 # Windows (cocher « Fre
 sudo apt install tesseract-ocr tesseract-ocr-fra        # Linux
 ```
 
+**Exemples de la suite** (accueil) : neuf histoires fictives — compta, chantier, e-commerce, freelance, finance,
+marketing, assurance, boutique, immobilier — dont les relevés et exports se convertissent ici puis se suivent dans Tab,
+Viz, Trésorerie, Nexus, Projets et Wiki (dossier `exemples-suite/`, généré par Atelier_Deploy).
+
 Premier essai : **Convertir → Essayer avec un exemple** (`samples/` : un relevé PDF fictif sur deux pages, un export
 CSV Windows-1252 avec préambule, un fichier OFX, et le même relevé scanné pour l'OCR).
 

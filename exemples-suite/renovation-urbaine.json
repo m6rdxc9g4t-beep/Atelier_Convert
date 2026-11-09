@@ -1,0 +1,51 @@
+{
+ "format": "atelier-exemples/1",
+ "histoire": {
+  "id": "renovation-urbaine",
+  "titre": "Rénovation Urbaine 2026",
+  "sous_titre": "Suivi d'un chantier de réhabilitation",
+  "secteur": "Chantier",
+  "resume": "La réhabilitation d'un immeuble de logements à Villeurbanne : planning des lots, situations de travaux payées depuis le compte chantier, budget par lot ; le gros œuvre dépasse son enveloppe du mois."
+ },
+ "tab": {
+  "projet_id": "prj_ex_renovation-urbaine",
+  "projet": "Rénovation Urbaine 2026"
+ },
+ "fichiers": [
+  {
+   "fichier": "renovation-urbaine/releve-2026-08.pdf",
+   "titre": "Relevé août 2026 (PDF)",
+   "description": "7 opérations, solde final 96 779,50 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé août 2026 — Rénovation Urbaine 2026"
+  },
+  {
+   "fichier": "renovation-urbaine/releve-2026-09.pdf",
+   "titre": "Relevé septembre 2026 (PDF)",
+   "description": "8 opérations, solde final 109 209,00 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé septembre 2026 — Rénovation Urbaine 2026"
+  },
+  {
+   "fichier": "renovation-urbaine/releve-2026-10.pdf",
+   "titre": "Relevé octobre 2026 (PDF)",
+   "description": "9 opérations, solde final 126 408,50 €.",
+   "type": "releve",
+   "nom_conversion": "Relevé octobre 2026 — Rénovation Urbaine 2026"
+  },
+  {
+   "fichier": "renovation-urbaine/situations-de-travaux.csv",
+   "titre": "Situations de travaux (CSV)",
+   "description": "Export du maître d'œuvre : une ligne par situation, lot et entreprise.",
+   "type": "csv",
+   "nom_conversion": "Situations de travaux — Rénovation Urbaine 2026"
+  },
+  {
+   "fichier": "renovation-urbaine/operations-2026-08-2026-10.csv",
+   "titre": "Opérations catégorisées (CSV)",
+   "description": "Les trois mois, catégorisés, au format CSV français : à importer dans Trésorerie.",
+   "type": "csv",
+   "nom_conversion": "Opérations catégorisées — Rénovation Urbaine 2026"
+  }
+ ]
+}
