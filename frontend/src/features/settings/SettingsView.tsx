@@ -4,7 +4,7 @@ import { Cloud, HardDrive, Monitor, Moon, RefreshCw, Sun } from "lucide-react";
 import { usePreferences } from "../../hooks/usePreferences";
 import { useProviders } from "../../hooks/useProviders";
 import { type ThemePreference, useTheme } from "../../hooks/useTheme";
-import { CLAUDE_MODELS, claudeModelLabel, ollamaChoices, ollamaSelected } from "../../lib/engine";
+import { CLAUDE_MODELS, claudeAccessNote, claudeModelLabel, ollamaChoices, ollamaSelected } from "../../lib/engine";
 import type { ClaudeModel, ProviderStatus } from "../../types/ai";
 import { OcrSection } from "./OcrSection";
 import { TabSection } from "./TabSection";
@@ -118,11 +118,7 @@ export function SettingsView({ info }: { info: AppInfo | null }) {
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-xs text-muted">
-          Claude passe par la CLI Claude Code connectée à votre abonnement (CLAUDE_MODE=cli dans backend/.env ; exécutable cherché dans CLAUDE_CLI, le PATH, ~/.local/bin,
-          /opt/homebrew/bin et /usr/local/bin), lancée isolée et sans outils, ou par l'API avec une clé (CLAUDE_MODE=api). Le moteur (Auto · Ollama · Claude) se choisit dans
-          « Structurer avec l'IA » ; « Auto » prend Claude en ligne quand il est disponible, sinon Ollama.
-        </p>
+        <p className="mt-2 text-xs text-muted">{claudeAccessNote(providers.providers.find((p) => p.name === "anthropic"))}</p>
       </section>
       <OcrSection />
       <TabSection />

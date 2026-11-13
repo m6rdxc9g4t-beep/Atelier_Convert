@@ -86,6 +86,29 @@ export function fileNameFrom(disposition: string | null, fallback: string): stri
   return plain?.[1] ?? fallback;
 }
 
+const engineDownListeners = new Set<() => void>();
+
+/**
+ * S'abonner aux refus « moteur indisponible » (503) des routes d'IA : Ollama injoignable, jeton du forfait Claude
+ * refusé… L'état des moteurs affiché (pastilles, sélecteur) est alors périmé. Retourne la fonction de désabonnement.
+ */
+export function onEngineDown(listener: () => void): () => void {
+  engineDownListeners.add(listener);
+  return () => {
+    engineDownListeners.delete(listener);
+  };
+}
+
+/** Demande à un moteur d'IA : un 503 prévient les abonnés d'`onEngineDown`, puis l'erreur suit son cours. */
+async function aiRequest<T>(path: string, init?: RequestInit): Promise<T> {
+  try {
+    return await request<T>(path, init);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 503) engineDownListeners.forEach((listener) => listener());
+    throw err;
+  }
+}
+
 export const api = {
   health: () => request<{ status: "ok"; app: string; version: string; environment: string }>("/health"),
   /** `refresh` : revérifie Claude tout de suite (sinon état gardé 60 s par le serveur). */
@@ -117,7 +140,7 @@ export const api = {
     sendToTab: (id: string, projectId: string, tableName: string | null) =>
       request<SendToTabResult>(`/conversions/${id}/send-to-tab`, { method: "POST", body: JSON.stringify({ project_id: projectId, table_name: tableName }) }),
     structure: (id: string, body: StructureRequest, signal?: AbortSignal) =>
-      request<StructureResult>(`/conversions/${id}/structure`, { method: "POST", body: JSON.stringify(body), signal }),
+      aiRequest<StructureResult>(`/conversions/${id}/structure`, { method: "POST", body: JSON.stringify(body), signal }),
   },
 
   tab: () => request<TabStatus>("/tab"),
