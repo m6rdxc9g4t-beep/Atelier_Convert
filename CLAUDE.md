@@ -13,6 +13,15 @@ Tab. Même architecture et même design qu'Atelier Viz (FastAPI + React), dont i
   `conftest` ajoute `testserver` à `allowed_hosts`.
 - Seule « Structurer avec l'IA » peut envoyer du texte, sur demande : Ollama (local) ou Claude (mode « En ligne » seulement,
   403 sinon). L'interface dit exactement ce qui part (ligne bouclier de `EnginePicker`).
+- **Jeton du forfait Claude** (décision de l'utilisateur : « je veux que Claude forfait cli soit actif car c'est personnel
+  ça sera mon forfait Claude » ; README) : `CLAUDE_OAUTH_TOKEN` renseigné → Claude = la CLI isolée, mêmes drapeaux, quel
+  que soit `CLAUDE_MODE` et prioritaire sur la clé API (`build_claude_provider`). Seul écart à la liste blanche de §5.3 :
+  `CLAUDE_CODE_OAUTH_TOKEN` dans l'environnement de la CLI (pour `-p` seulement), `HOME` / `CLAUDE_CONFIG_DIR` vers
+  `<DATA_DIR>/claude-forfait/`. Limite : jeton lu une fois (`app/claude_token.py`, `capture` dans `create_app` et
+  `desktop.run`), retiré de l'environnement, jamais dans `Settings`, `.env`, une réponse, une erreur (`scrub`), un journal,
+  un argument ni un fichier ; disponibilité = exécutable + jeton ; hors ligne rien n'est lancé ; sans jeton, rien ne change.
+  `ProviderStatus.access` (`cli` / `token` / `api`) le dit à l'interface ; un 503 de « Structurer » relit l'état des
+  moteurs (`onEngineDown`). Tests : `test_claude_token.py` (`conftest` retire le jeton de la machine).
 - Aucune ressource externe au chargement du frontend (pas de CDN, pas de Google Fonts).
 
 ## Stack
