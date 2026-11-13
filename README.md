@@ -35,6 +35,7 @@ npm run dev                                             # http://127.0.0.1:5176
 # 3. Optionnel — IA
 ollama serve && ollama pull llama3.2                    # IA locale
 claude auth login                                       # Claude (mode « En ligne »), avec votre compte claude.ai
+                                                        # (sur un serveur : jeton du forfait, voir plus bas)
 
 # 4. Optionnel — OCR des relevés scannés et des photos
 brew install tesseract tesseract-lang                   # macOS
@@ -80,6 +81,32 @@ Réglages : `CONVERT_OCR_TESSERACT` (chemin de l'exécutable si l'app ne le trou
 `/usr/local/bin`, `Program Files\Tesseract-OCR`), `CONVERT_OCR_LANGUAGES`, `CONVERT_OCR_TESSDATA`, `CONVERT_OCR_DPI`
 (300), `CONVERT_OCR_MAX_PAGES` (50), `CONVERT_OCR_ENABLED`. Un scan droit à 300 ppp donne les meilleurs résultats ;
 **vérifiez toujours** les montants : le contrôle des soldes signale une opération mal lue.
+
+## Claude sur un serveur : le jeton du forfait (`CLAUDE_OAUTH_TOKEN`)
+
+Sur un serveur (VPS, conteneur), personne n'a fait `claude auth login` : il n'y a pas de session à lire. « Structurer
+avec l'IA » passe alors par la même CLI Claude Code isolée, authentifiée par le **jeton de votre forfait** — usage
+personnel : c'est votre abonnement Pro ou Max qui sert, pas une clé API.
+
+1. Sur votre ordinateur, Claude Code connecté à votre compte : `claude setup-token`. Il affiche un jeton
+   `sk-ant-oat01-…` valable un an.
+2. Sur le serveur, donnez-le au processus d'Atelier Convert par la **variable d'environnement** `CLAUDE_OAUTH_TOKEN`
+   (`environment:` du service, jamais `backend/.env` : il n'y est pas lu), puis redémarrez. La CLI Claude Code doit
+   être installée sur le serveur (dans l'image) ; si elle n'est pas dans le `PATH`, `CLAUDE_CLI=/chemin/absolu/claude`.
+3. Passez **En ligne** : le voyant « Claude » s'allume, les Réglages disent « Forfait Claude, par jeton ».
+
+| Règle | Détail |
+|---|---|
+| Priorité | Jeton renseigné → Claude = la CLI par jeton, **quel que soit `CLAUDE_MODE`**, même si `ANTHROPIC_API_KEY` est renseignée (la clé n'est alors pas utilisée, et jamais transmise à la CLI). Sans jeton, rien ne change. |
+| Isolation | Exactement les mêmes options que sur un ordinateur (aucun outil, dossier de travail vide, texte du document sur l'entrée standard). Seules différences : `CLAUDE_CODE_OAUTH_TOKEN` dans l'environnement de la CLI, et `HOME` / `CLAUDE_CONFIG_DIR` vers un dossier privé, `<DATA_DIR>/claude-forfait/` (créé au besoin, droits 700). |
+| Le jeton | Lu une fois au démarrage puis retiré de l'environnement du processus : aucun autre sous-processus (Tesseract, mise à jour…) n'en hérite. Jamais dans une réponse, une erreur, un journal, un argument de ligne de commande ni un fichier. |
+| Disponibilité | CLI trouvée + jeton présent (pas de `claude auth status`). Hors ligne, Claude est refusé (403) et la CLI n'est pas lancée. |
+| Jeton refusé ou expiré | « refaites `claude setup-token` et mettez à jour le jeton du serveur » ; Claude s'éteint (« Auto » passe par Ollama) jusqu'à « Revérifier » ou au redémarrage avec le nouveau jeton. |
+| Limites | Celles de votre forfait, **partagées entre toutes les applications de la suite** qui utilisent ce jeton (et avec votre propre usage de Claude). Limite atteinte : le message de Claude Code est repris, réessayez plus tard ou choisissez Ollama. |
+
+Le serveur garde ce que tout processus garde de son lancement : la variable reste visible de l'administrateur de la
+machine (`docker inspect`, `/proc/<pid>/environ`). Ne partagez pas l'accès au serveur ; au moindre doute, remplacez
+le jeton.
 
 ## Envoyer dans Atelier Tab
 
